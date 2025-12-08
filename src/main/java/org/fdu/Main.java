@@ -14,7 +14,7 @@ public class Main {
                   Yellow - letter is in the word, but not in the correct position\s
                   Gray   - letter is NOT in the word
               """;
-    private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word): ";
+    private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
 
 
     static void main() {
@@ -22,12 +22,12 @@ public class Main {
         // construct dictionary & UI objects
         //  ToDo - possibly create as singletons?
         WordleDictionary dictionary = new WordleDictionary();
-        WordleUI output = new WordleUI();
+        WordleUI ui = new WordleUI();
 
         // Display intro information
-        output.writeMessage(WORDLE_INTRO);
-        output.writeMessage(GAME_OVERVIEW);
-        output.writeMessage(PROMPT_MESSAGE);
+        ui.writeMessage(WORDLE_INTRO);
+        ui.writeMessage(GAME_OVERVIEW);
+        ui.writeMessage(PROMPT_MESSAGE);
 
         // for testing
         for (int itr = 1; itr < 6; itr++) {
@@ -39,7 +39,21 @@ public class Main {
                     ConsoleColors.GRAY + letters [2] +
                     ConsoleColors.YELLOW + letters[3] +
                     ConsoleColors.RESET + letters[4];
-            output.writeMessage(coloredOutput);
+            ui.writeMessage(coloredOutput);
+        }
+
+        // test out reading from the console
+        String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
+        ui.writeMessage(userGuess);
+
+        // test out validation of input from the console
+        GuessValidation guessValidation = new GuessValidation();
+        boolean validGuess;
+        for (int itr = 0; itr < 5; itr++) {
+            userGuess = ui.getUserGuess(PROMPT_MESSAGE);
+            ui.writeMessage(userGuess);
+            ui.writeMessage(String.format("Guess validity is %s", guessValidation.isWordValid(userGuess) ));
+            ui.writeMessage(String.format("\tNormalized guess is %s", guessValidation.normalizeWord(userGuess)));
         }
     }
 }
