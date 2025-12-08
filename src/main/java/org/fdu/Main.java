@@ -3,15 +3,18 @@ package org.fdu;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    private static String WORDLE_INTRO = "\t\t\tWelcome to FDU Wordle\n";
+    private static final String WORDLE_INTRO = "\t\t\tWelcome to FDU Wordle\n";
       // ToDo - update to screen size independent (not sure what this means yet)
-    private static String GAME_OVERVIEW = "\nA five (5) letter US English word will be selected \n" +
-            "  your task is to guess the word in six (6) or fewer guesses (valid US English words only) \n" +
-            "  After each turn, the game will evaluate your guess as follows: \n" +
-            "    Green  - letter is in the word & in the correct position \n" +
-            "    Yellow - letter is in the word, but not in the correct position \n" +
-            "    Gray   - letter is NOT in the word\n";
-    private static String PROMPT_MESSAGE = "\nYour guess (5 letter word): ";
+    private static final String GAME_OVERVIEW = """
+              
+              A five (5) letter US English word will be selected\s
+                your task is to guess the word in six (6) or fewer guesses (valid US English words only)\s
+                After each turn, the game will evaluate your guess as follows:\s
+                  Green  - letter is in the word & in the correct position\s
+                  Yellow - letter is in the word, but not in the correct position\s
+                  Gray   - letter is NOT in the word
+              """;
+    private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word): ";
 
 
     static void main() {
