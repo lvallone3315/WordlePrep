@@ -31,7 +31,15 @@ public class Main {
 
         // for testing
         for (int itr = 1; itr < 6; itr++) {
-            output.writeMessage(String.format("\nWord %s: %s", itr, dictionary.pickNewWord()));
+            // cycle through colors in word
+            char[] letters = dictionary.pickNewWord().toCharArray();
+            String coloredOutput = String.format("\nWord %s: ", itr);
+            coloredOutput += ConsoleColors.RED + letters[0] +
+                    ConsoleColors.GREEN + letters[1] +
+                    ConsoleColors.GRAY + letters [2] +
+                    ConsoleColors.YELLOW + letters[3] +
+                    ConsoleColors.RESET + letters[4];
+            output.writeMessage(coloredOutput);
         }
     }
 }
