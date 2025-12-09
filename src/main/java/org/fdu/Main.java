@@ -44,16 +44,24 @@ public class Main {
 
         // test out reading from the console
         String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-        ui.writeMessage(userGuess);
+        ui.writeMessage(userGuess + '\n');
 
         // test out validation of input from the console
         GuessValidation guessValidation = new GuessValidation();
+        GuessEvaluation guessEval = new GuessEvaluation();
+        String secretWord = dictionary.pickNewWord();
+        GuessEvaluation.Result[] results;
+
         boolean validGuess;
+        ui.writeMessage(secretWord + "\n\n");
         for (int itr = 0; itr < 5; itr++) {
             userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-            ui.writeMessage(userGuess);
+            ui.writeMessage(userGuess + '\n');
             ui.writeMessage(String.format("Guess validity is %s", guessValidation.isWordValid(userGuess) ));
-            ui.writeMessage(String.format("\tNormalized guess is %s", guessValidation.normalizeWord(userGuess)));
+            String userGuessNorm = guessValidation.normalizeWord(userGuess);
+            ui.writeMessage(String.format("\tNormalized guess is %s\n", userGuessNorm));
+            results = guessEval.evaluateGuess(userGuessNorm, secretWord);
+            ui.printGuessResult(userGuessNorm, results);
         }
     }
 }

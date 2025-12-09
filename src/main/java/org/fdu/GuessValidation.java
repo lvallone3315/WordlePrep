@@ -3,16 +3,20 @@ package org.fdu;
  * GuessValidation Class
  * Codes validation rules including length (exactly 5 characters), allowable characters (a-z & A-Z)
  * Normalizes the guess (removes leading and trailing white space), shifts all characters to UPPERCASE
+ *
+ * WORD_LENGTH - defines the length for guesses and secret words
  */
-public class GuessValidation {
+public final class GuessValidation {
     public GuessValidation() {};   // empty constructor - nothing for now
+
+    public static final int WORD_LENGTH = 5;
 
     /**
      * Validate if guess meets the game requirements (e.g. exactly 5 characters, all alphabetic a-z)
      * @param userGuess
      * @return true - word meets all game requirements for a valid guess, false - otherwise
      */
-    public boolean isWordValid(String userGuess) {
+    public static boolean isWordValid(String userGuess) {
         boolean firstNonWhiteSpaceChar = false;
         int wordLength = 0;
 
@@ -25,11 +29,7 @@ public class GuessValidation {
                 return false;
             }
         }
-        if (wordLength == 5) {
-            return true;  // if we got here, all
-        } else {
-            return false;
-        }
+        return wordLength == WORD_LENGTH;  // final check - valid (ie true) if wordLength is 5, false otherwise
     }
 
     /**
@@ -37,8 +37,7 @@ public class GuessValidation {
      * @param userGuess - word typed in by user, no assumptions made about it being valid
      * @return String without leading whitespace & in CAPs
      */
-    public String normalizeWord(String userGuess) {
-        String normalizedString = userGuess.trim().toUpperCase();
-        return normalizedString;
+    public static String normalizeWord(String userGuess) {
+        return userGuess.trim().toUpperCase();
     }
 }
