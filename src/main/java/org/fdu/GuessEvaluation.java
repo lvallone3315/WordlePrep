@@ -18,7 +18,7 @@ import java.util.List;
 public class GuessEvaluation {
     // private data declarations
     private int numGuesses = 0;    // tracks # of guesses the user has made
-    private static int guessLimit = 6;
+    private static final int guessLimit = 6;
 
     // Empty constructor for now, in the future may allow configurable word size
     public GuessEvaluation() {
