@@ -11,7 +11,7 @@ import java.util.List;
  *   method to check if user has used all of the allowable guesses
  *
  * class assumes the users guess has been validated prior to calling here
- *   ToDo - throw exception if the userGuess &/or secretWord are not valid
+ *   ToDo - throw exception if the userGuess and/or secretWord are not valid
  *   Or at the very least, return all Gray
  */
 
@@ -35,7 +35,7 @@ public class GuessEvaluation {
      *    Returns an array (size of userGuess, should be equal to WORD_LENGTH)
      *    If arguments valid (expecting call to validate prior), will increment user turn count
      *    Does not check if game is won (separate method)
-     *    Errors: if the userGuess &/or secretWord are not valid (isWordValid()) return all GRAY
+     *    Errors: if the userGuess and/or secretWord are not valid (isWordValid()) return all GRAY
      *       ToDo: throw an exception instead - since it is expected userGuess is validated prior to calling
      *
      * @param userGuess - string containing the user guess, validate prior to calling

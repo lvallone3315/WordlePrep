@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html","k":"18"},{"p":"org.fdu","l":"ConsoleColors"},{"p":"org.fdu","l":"GuessEvaluation"},{"p":"org.fdu","l":"GuessValidation"},{"p":"org.fdu","l":"Main"},{"p":"org.fdu","l":"GuessEvaluation.Result","k":"9"},{"p":"org.fdu","l":"WordleDictionary"},{"p":"org.fdu","l":"WordleUI"}];updateSearchResults();
