@@ -16,6 +16,10 @@ public class Main {
               """;
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
 
+    private static final String INVALID_ENTRY = "Invalid entry, please re-enter your guess";
+    private static final String WINNER = "Congratulations!  You are the Wordle Champ of the day";
+    private static final String LOSER = "Sorry!  You didn't guess the word, the word was: ";
+
 
     static void main() {
 
@@ -23,45 +27,27 @@ public class Main {
         //  ToDo - possibly create as singletons?
         WordleDictionary dictionary = new WordleDictionary();
         WordleUI ui = new WordleUI();
+        GuessValidation guessValidation = new GuessValidation();
+        GuessEvaluation guessEval = new GuessEvaluation();
+
+        GuessEvaluation.Result[] results;
 
         // Display intro information
         ui.writeMessage(WORDLE_INTRO);
         ui.writeMessage(GAME_OVERVIEW);
-        ui.writeMessage(PROMPT_MESSAGE);
-
-        // for testing
-        for (int itr = 1; itr < 6; itr++) {
-            // cycle through colors in word
-            char[] letters = dictionary.pickNewWord().toCharArray();
-            String coloredOutput = String.format("\nWord %s: ", itr);
-            coloredOutput += ConsoleColors.RED + letters[0] +
-                    ConsoleColors.GREEN + letters[1] +
-                    ConsoleColors.GRAY + letters [2] +
-                    ConsoleColors.YELLOW + letters[3] +
-                    ConsoleColors.RESET + letters[4];
-            ui.writeMessage(coloredOutput);
-        }
-
-        // test out reading from the console
-        String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-        ui.writeMessage(userGuess + '\n');
-
-        // test out validation of input from the console
-        GuessValidation guessValidation = new GuessValidation();
-        GuessEvaluation guessEval = new GuessEvaluation();
         String secretWord = dictionary.pickNewWord();
-        GuessEvaluation.Result[] results;
-
-        boolean validGuess;
+        // debug
         ui.writeMessage(secretWord + "\n\n");
-        for (int itr = 0; itr < 5; itr++) {
-            userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-            ui.writeMessage(userGuess + '\n');
-            ui.writeMessage(String.format("Guess validity is %s", guessValidation.isWordValid(userGuess) ));
-            String userGuessNorm = guessValidation.normalizeWord(userGuess);
-            ui.writeMessage(String.format("\tNormalized guess is %s\n", userGuessNorm));
-            results = guessEval.evaluateGuess(userGuessNorm, secretWord);
-            ui.printGuessResult(userGuessNorm, results);
+
+        while (!guessEval.isUserOutOfGuesses()) {
+            String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
+            if (!guessValidation.isWordValid(userGuess)) {
+                ui.writeMessage(INVALID_ENTRY);
+            }
+            String normalizedUserGuess = guessValidation.normalizeWord(userGuess);
+            results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
+            ui.printGuessResult(normalizedUserGuess, results);
+            // check for winning here
         }
     }
 }
