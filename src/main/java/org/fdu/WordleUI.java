@@ -3,7 +3,10 @@ package org.fdu;
 public class WordleUI {
     public WordleUI() {}; // empty constructor
 
-    // write the output message to the console, user must define newlines in message (as needed)
+    /**
+     * write the output message to the console, user must define newlines in message (as needed)
+     * @param message - text to be written to the console
+     */
     public void writeMessage(String message) {
         IO.print(message);
     }
@@ -25,11 +28,12 @@ public class WordleUI {
      *   Note: resets the colors as a final step
      * Important: the length of the guess and the length of the guessEval must match
      *   ToDo - throw exception if they don't, or iterate through the shortest of the two
-     * @param guess
-     * @param guessEval
+     * @param guess -- user's guess (raw or normalized, no requirement)
+     * @param guessEval -- array of colors (enum) denoting "correctness" of each character in user's guess
      */
     public void printGuessResult(String guess, GuessEvaluation.Result[] guessEval ) {
         for (int itr = 0; itr < guessEval.length; itr++) {
+            IO.print("\t\t");  // offset the text to improve readability
             switch (guessEval[itr]) {
                 case GuessEvaluation.Result.GRAY:
                     IO.print(ConsoleColors.GRAY + guess.charAt(itr));
@@ -46,6 +50,6 @@ public class WordleUI {
             }
         }
         IO.print(ConsoleColors.RESET);
-    }
+    }  // end printGuessResult
 
 }

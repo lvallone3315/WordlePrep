@@ -33,7 +33,8 @@ public class GuessEvaluation {
     /**
      * Evaluate the users guess
      *    Returns an array (size of userGuess, should be equal to WORD_LENGTH)
-     *    If arguments valid, will increment # user turn count, does not validate (caller responsibility)
+     *    If arguments valid (expecting call to validate prior), will increment user turn count
+     *    Does not check if game is won (separate method)
      *    Errors: if the userGuess &/or secretWord are not valid (isWordValid()) return all GRAY
      *       ToDo: throw an exception instead - since it is expected userGuess is validated prior to calling
      *
@@ -94,4 +95,15 @@ public class GuessEvaluation {
     public boolean isUserOutOfGuesses() {
         return numGuesses >= guessLimit;
     }
+
+    /**
+     *
+     */
+    public boolean isGuessCorrect(String userGuess, String secretWord) {
+        for (int itr = 0; itr < secretWord.length(); itr++) {
+            if (userGuess.charAt(itr) != secretWord.charAt(itr))
+                return false;
+        }
+        return true; // all characters matched - user WON
+    }  // end isGuessCorrect()
 }

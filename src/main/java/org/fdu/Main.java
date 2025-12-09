@@ -17,8 +17,8 @@ public class Main {
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
 
     private static final String INVALID_ENTRY = "Invalid entry, please re-enter your guess";
-    private static final String WINNER = "Congratulations!  You are the Wordle Champ of the day";
-    private static final String LOSER = "Sorry!  You didn't guess the word, the word was: ";
+    private static final String WINNER = "\n\nCongratulations!  You are the Wordle Champ of the day";
+    private static final String LOSER = "\n\nSorry!  You didn't guess the word, the word was: ";
 
 
     static void main() {
@@ -31,14 +31,25 @@ public class Main {
         GuessEvaluation guessEval = new GuessEvaluation();
 
         GuessEvaluation.Result[] results;
+        boolean userWon = false;
 
         // Display intro information
         ui.writeMessage(WORDLE_INTRO);
         ui.writeMessage(GAME_OVERVIEW);
         String secretWord = dictionary.pickNewWord();
-        // debug
+
+        // debug help - to be deleted
         ui.writeMessage(secretWord + "\n\n");
 
+        /*
+         *                     Main game loop
+         *        while user hasn't guessed the secret word or exhausted their guesses
+         *   getUserGuess()
+         *   check isWordValid(), if not print error message, and continue to next guess
+         *   change guess to uppercase, trim whitespace
+         *   evaluate the guess & print the results (color coded)
+         *   if user won - print win message & exit game loop
+         */
         while (!guessEval.isUserOutOfGuesses()) {
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
             if (!guessValidation.isWordValid(userGuess)) {
@@ -47,7 +58,14 @@ public class Main {
             String normalizedUserGuess = guessValidation.normalizeWord(userGuess);
             results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
             ui.printGuessResult(normalizedUserGuess, results);
-            // check for winning here
+            if (guessEval.isGuessCorrect(normalizedUserGuess, secretWord)) {
+                ui.writeMessage(WINNER);
+                userWon = true;
+                break;   // user won the game,
+            }
+        }  // end main game loop
+        if (userWon == false) {
+            ui.writeMessage(LOSER);
         }
     }
 }

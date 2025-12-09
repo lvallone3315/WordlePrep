@@ -1,15 +1,27 @@
 package org.fdu;
 
+import org.junit.jupiter.api.BeforeAll;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.BeforeAll.*;
 
 class GuessValidationTest {
 
+    static GuessValidation validator;
+
+    @BeforeAll
+    static void setup() {
+        validator = new GuessValidation();
+    }
+
     @org.junit.jupiter.api.Test
     void isWordValid() {
-        GuessValidation validator = new GuessValidation();
-        // define a few invalid and valid guesses, trailing V marks test cases expected to pass
-        // Valid:  five alphabetic chars, case insensitive, leading & trailing white space ignored
-        // Invalid: Numerics, control characters, special characters (e.g. hyphens, etc.), white space between letters
+
+        System.out.println("define invalid and valid guesses, trailing V marks test cases expected to pass");
+        System.out.println("  Valid:  five alphabetic chars, case insensitive, leading & trailing white space ignored");
+        System.out.println("  Invalid: Numerics, control characters, special characters (e.g. hyphens, etc.), " +
+                        "white space between letters");
+
         String sixChars = "abcdef";
         String fiveMixedCaseV = "xYZaB";
         String fourChars = "LMNO";
@@ -20,6 +32,11 @@ class GuessValidationTest {
         String allUpperV = "ABCDE";
         String leadingWhiteV = "  PLATE  ";
         String inBetweenWhite = "SH EP";
+
+        System.out.println("Example tests: ");
+        System.out.print(sixChars + " ");  System.out.print(fiveMixedCaseV + " ");
+        System.out.print(numeric + " "); System.out.println(nonAlpha);
+
         // ToDo: missing test case for control chars
         assertFalse(validator.isWordValid(sixChars), "six char guess, should be invalid");
         assertTrue(validator.isWordValid(fiveMixedCaseV), "mixed case, 5 letters, should be valid");
@@ -35,5 +52,24 @@ class GuessValidationTest {
 
     @org.junit.jupiter.api.Test
     void normalizeWord() {
+        System.out.println("verify leading and trailing white space is removed");
+        System.out.println("  & all characters are converted to uppercase");
+
+        String leadingWhitePre = "   Shuffling";
+        String leadingWhitePost = "SHUFFLING";
+        String trailingWhitePre = "mADNESS   ";
+        String trailingWhitePost = "MADNESS";
+        String leadingTrailingWhitePre = "\tLoCoM\t\n";
+        String leadingTrailingWhitePost = "LOCOM";
+        String midWordWhitePre = "Bre ath";
+        String midWordWhitePost = "BRE ATH";
+        assertEquals(leadingWhitePost, validator.normalizeWord(leadingWhitePre),
+                "Leading white space not deleted");
+        assertEquals(trailingWhitePost, validator.normalizeWord(trailingWhitePre),
+                "Trailing white space not deleted");
+        assertEquals(leadingTrailingWhitePost, validator.normalizeWord(leadingTrailingWhitePre),
+                "Leading &/or trailing white space not deleted");
+        assertEquals(midWordWhitePost, validator.normalizeWord(midWordWhitePre),
+                "mid-word white space not handled correctly");
     }
 }
