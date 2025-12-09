@@ -13,23 +13,20 @@ public final class GuessValidation {
 
     /**
      * Validate if guess meets the game requirements (e.g. exactly 5 characters, all alphabetic a-z)
+     *   Note: leading and trailing white space is allowed & does not affect the guess
      * @param userGuess
      * @return true - word meets all game requirements for a valid guess, false - otherwise
      */
     public static boolean isWordValid(String userGuess) {
-        boolean firstNonWhiteSpaceChar = false;
-        int wordLength = 0;
+        String localUserGuess = userGuess.trim();  // trim leading and trailing white space
 
-        for (int i = 0; i < userGuess.length(); i++) {
-            if (!firstNonWhiteSpaceChar && Character.isWhitespace(userGuess.charAt(i))) continue;  // if leading whitespace, ignore
-            // if we got here - then we are past leading white space, so just check letters
-            firstNonWhiteSpaceChar = true;
-            wordLength++;
-            if (!Character.isLetter(userGuess.charAt(i))) {
+        if (localUserGuess.length() != WORD_LENGTH) return false;  // first trim
+        for (int i = 0; i < localUserGuess.length(); i++) {
+            if (!Character.isLetter(localUserGuess.charAt(i))) {
                 return false;
             }
         }
-        return wordLength == WORD_LENGTH;  // final check - valid (ie true) if wordLength is 5, false otherwise
+        return true;  // already checked length - all else looks valid
     }
 
     /**
