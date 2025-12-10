@@ -5,20 +5,22 @@ import java.util.Arrays;  // to use Arrays.fill utility
 import java.util.List;
 
 /**
- * Evaluates the users guess against the secret word (selected from the dictionary)
- * Defines the colors indicating the "correctness" of each character in the user's guess
- * Tracks the number of guesses by the user, initialized by constructor, incremented by evaluater
- *   method to check if user has used all of the allowable guesses
+ * Evaluates the users guess against the secret word (selected from the dictionary).
+ * Defines the colors indicating the "correctness" of each character in the user's guess.
+ * Tracks the number of guesses by the player, initialized to zero by constructor, incremented by guess evaluater.
+ *   method available to check if user has used all of the allowable guesses (hardcoded as 6 in GUESS_LIMIT)
  *
- * class assumes the users guess has been validated prior to calling here
+ * class assumes the users guess are validated prior to calling here
+ *   In current implementation: if the userGuess is invalid (e.g. >5 chars), an all GRAY result is returned
  *   ToDo - throw exception if the userGuess and/or secretWord are not valid
- *   Or at the very least, return all Gray
  */
 
 public class GuessEvaluation {
+
+    public static final int GUESS_LIMIT = 6;
+
     // private data declarations
     private int numGuesses = 0;    // tracks # of guesses the user has made
-    private static final int guessLimit = 6;
 
     // Empty constructor for now, in the future may allow configurable word size
     public GuessEvaluation() {
@@ -30,11 +32,12 @@ public class GuessEvaluation {
      */
     public enum Result  {GREEN, YELLOW, GRAY}
 
+
     /**
      * Evaluate the users guess
-     *    Returns an array (size of userGuess, should be equal to WORD_LENGTH)
-     *    If arguments valid (expecting call to validate prior), will increment user turn count
-     *    Does not check if game is won (separate method)
+     *    Returns an array (size of userGuess, equal to WORD_LENGTH)
+     *    If arguments valid (caller to validate prior), increments user turn count
+     *      Note: Does not check if game is won (separate method)
      *    Errors: if the userGuess and/or secretWord are not valid (isWordValid()) return all GRAY
      *       ToDo: throw an exception instead - since it is expected userGuess is validated prior to calling
      *
@@ -47,10 +50,10 @@ public class GuessEvaluation {
         Result[] resultArray = new Result[userGuess.length()];
         Arrays.fill(resultArray, Result.GRAY);
 
-        // protect ourselves - validate both the userGuess & the secretWord
+        // validate both the userGuess & the secretWord (hopefully validated prior to calling)
         if (!GuessValidation.isWordValid(userGuess) ||  !GuessValidation.isWordValid(secretWord)) return resultArray;
 
-        // update guess count - if we got here, have a valid guess
+        // update guess count - if we got here, valid guess
         numGuesses++;
 
         /*
@@ -67,39 +70,49 @@ public class GuessEvaluation {
         }
 
         // walk through the guess
+        //  FIRST phase - exact match of letter & location
+        //       Result[letter location] = Green & delete character at that location
+        //  SECOND phase - for all non-exact matches
         //    if character in same location in secret word array
-        //       Result[letter location] = Green & delete that character at that location
         //    if not and character in secret word list
         //       Result[letter location] = Yellow & delete character from list
         //    else
         //       Result[letter location] = Gray (no deletion)
         for (int itr = 0; itr < userGuess.length(); itr++) {
-            // System.out.println("Secret Word List is: " + letters);
             if (userGuess.charAt(itr) == secretWord.charAt(itr)) {
                 resultArray[itr] = Result.GREEN;
                 letters.remove((Object) userGuess.charAt(itr));  // this may be a problem - possible to remove wrong letter?
             }
-            else if (letters.remove((Object) userGuess.charAt(itr))) {
-                resultArray[itr] = Result.YELLOW;
-            }
-            else resultArray[itr] = Result.GRAY;
+        }
+        for (int itr = 0; itr < userGuess.length(); itr++) {
+            if (resultArray[itr] != Result.GREEN) {
+                if (letters.remove((Object) userGuess.charAt(itr))) {
+                    resultArray[itr] = Result.YELLOW;
+                }
+                else resultArray[itr] = Result.GRAY;
+            }// exact matches handled in first phase
         }
 
         return resultArray;  // done - return the results
     }  // end evaluateGuess
+
 
     /**
      *  check if user has used all of their guesses
      * @return - true - out of guesses
      */
     public boolean isUserOutOfGuesses() {
-        return numGuesses >= guessLimit;
+        return numGuesses >= GUESS_LIMIT;
     }
 
+
     /**
-     *
+     * If ever letter in secret word matches corresponding guess, player has won
+     * @return true - all characters match position, false otherwise
      */
     public boolean isGuessCorrect(String userGuess, String secretWord) {
+        if (!GuessValidation.isWordValid(userGuess) ||  !GuessValidation.isWordValid(secretWord))
+            return false;  // validity check before proceeding
         for (int itr = 0; itr < secretWord.length(); itr++) {
             if (userGuess.charAt(itr) != secretWord.charAt(itr))
                 return false;

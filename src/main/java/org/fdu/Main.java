@@ -65,7 +65,7 @@ public class Main {
             }
         }  // end main game loop
         if (userWon == false) {
-            ui.writeMessage(LOSER);
+            ui.writeMessage(LOSER + secretWord);
         }
     }
 }
