@@ -1,0 +1,50 @@
+name: Build and Test Wordle (Prep Version)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup JDK 25    # using JDK 25 in maven file, maybe should adjust?
+        uses: actions/setup-java@v5.1.0
+        with:
+          java-version: '25'
+          distribution: 'temurin'  # maybe set to jetbrains, since developed with IntelliJ
+          #cache maven dependencies, recommended for faster builds
+          cache: 'maven'
+
+      - name: Build and Test with Maven
+        # 'package' goal runs all phases up to 'package', including 'compile'
+        run: mvn -B package --file pom.xml
+      - name: Archive test results (XML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordle-test-results-xml
+          path:
+            target/surefire-reports/*.xml
+
+      - name: Publish test results
+        if: always()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: 'target/surefire-reports/*.xml'
+
+      # Upload the generated JAR artifact if the build succeeds
+      - name: Upload JAR file
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-artifact
+          path: target/*.jar
+
+
+
