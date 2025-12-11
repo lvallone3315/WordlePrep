@@ -1,5 +1,7 @@
 package org.fdu;
 
+import org.fusesource.jansi.AnsiConsole;  // for colors
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
@@ -22,6 +24,8 @@ public class Main {
 
 
     static void main() {
+
+        // AnsiConsole.systemInstall(); // to support colors on all terminal types
 
         // construct dictionary & UI objects
         //  ToDo - possibly create as singletons?
