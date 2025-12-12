@@ -29,21 +29,29 @@ public class Main {
 
         // construct dictionary & UI objects
         //  ToDo - possibly create as singletons?
-        WordleDictionary dictionary = new WordleDictionary();
-        WordleUI ui = new WordleUI();
-        GuessValidation guessValidation = new GuessValidation();
-        GuessEvaluation guessEval = new GuessEvaluation();
+        // WordleDictionary dictionary = new WordleDictionary();
+        // GuessValidation guessValidation = new GuessValidation();
+        // GuessEvaluation guessEval = new GuessEvaluation();
 
-        GuessEvaluation.Result[] results;
-        boolean userWon = false;
+        /**
+         * To transition to WebUI interface - 3 phases
+         *   construct the game incl. picking the secret word (WordleGame constructor)
+         *   get and process a guess (game.processGuess)
+         *   evaluate the results (GuessResult methods)
+         */
+        WordleGame game = new WordleGame();  // create a new instance of game w/o UI
+        WordleUI ui = new WordleUI();
+
+        GuessEvaluation.Result[] results;    // to pass into the UI
+        // boolean userWon = false;  -- replace with call to guessResults
 
         // Display intro information
         ui.writeMessage(WORDLE_INTRO);
         ui.writeMessage(GAME_OVERVIEW);
-        String secretWord = dictionary.pickNewWord();
+        // String secretWord = dictionary.pickNewWord();
 
-        // debug help - to be deleted
-        ui.writeMessage(secretWord + "\n\n");
+        // debug help - ToDo: delete this
+        ui.writeMessage(game.getSecretWord() + "\n\n");
 
         /*
          *                     Main game loop
@@ -54,22 +62,22 @@ public class Main {
          *   evaluate the guess & print the results (color coded)
          *   if user won - print win message & exit game loop
          */
-        while (!guessEval.isUserOutOfGuesses()) {
+        GuessResult guessResult = null;
+        while (!game.isGameOver()) {
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-            if (!guessValidation.isWordValid(userGuess)) {
+            guessResult = game.processGuess(userGuess);
+            if (guessResult.getGuessStatus() == GuessResult.GuessStatus.INVALID) {
                 ui.writeMessage(INVALID_ENTRY);
             }
-            String normalizedUserGuess = guessValidation.normalizeWord(userGuess);
-            results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
-            ui.printGuessResult(normalizedUserGuess, results);
-            if (guessEval.isGuessCorrect(normalizedUserGuess, secretWord)) {
+            results = guessResult.getGuessEval();
+            ui.printGuessResult(userGuess, results);
+            if (guessResult.isGuessCorrect()) {
                 ui.writeMessage(WINNER);
-                userWon = true;
                 break;   // user won the game,
             }
         }  // end main game loop
-        if (userWon == false) {
-            ui.writeMessage(LOSER + secretWord);
+        if (guessResult.isGuessCorrect() == false) {
+            ui.writeMessage(LOSER + game.getSecretWord());
         }
     }
 }
