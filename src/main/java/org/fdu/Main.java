@@ -17,9 +17,12 @@ public class Main {
                   Gray   - letter is NOT in the word
               """;
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
+    private static final String INVALID_ENTRY = "Invalid entry, please re-enter your guess";
+    private static final String WINNER = "\n\nCongratulations!  You are the Wordle Champ of the day";
+    private static final String LOSER = "\n\nSorry!  You didn't guess the word, the word was: ";
 
 
-    static void main() {
+    public static void main(String[] args) {
 
         // AnsiConsole.systemInstall(); // to support colors on all terminal types
         /**
@@ -54,11 +57,11 @@ public class Main {
          *   if user won - print win message & exit game loop
          *   else if user lost - print lose message & exit game loop
          */
-        do {
+        while (true) {  // as long as gameOver code works, no need to set a condition
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
             GuessResult guessResult = game.processGuess(userGuess);
             if (guessResult.getGuessStatus() == GuessResult.GuessStatus.INVALID) {
-                ui.writeMessage(guessResult.getUserMessage());
+                ui.writeMessage(INVALID_ENTRY);
                 continue;
             }
             results = guessResult.getGuessEval();
@@ -67,13 +70,13 @@ public class Main {
             // now get the game status - captures if player won or if game over & player lost
             GameStatus gameStatus = game.getGameStatus();
             if (gameStatus.getUserWon()) {
-                ui.writeMessage(gameStatus.getUserMessage());
+                ui.writeMessage(WINNER);
                 break;   // user won the game,
             }
             else if (gameStatus.getGameOver()) {
-                ui.writeMessage(gameStatus.getUserMessage() + gameStatus.getSecretWord());
+                ui.writeMessage(LOSER + gameStatus.getSecretWord());
                 break;
             }
-        }  while (!game.isGameOver());  // end main game loop, redundant ...
+        }
     }
 }
