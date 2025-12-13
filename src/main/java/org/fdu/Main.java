@@ -18,21 +18,10 @@ public class Main {
               """;
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
 
-    private static final String INVALID_ENTRY = "Invalid entry, please re-enter your guess";
-    private static final String WINNER = "\n\nCongratulations!  You are the Wordle Champ of the day";
-    private static final String LOSER = "\n\nSorry!  You didn't guess the word, the word was: ";
-
 
     static void main() {
 
         // AnsiConsole.systemInstall(); // to support colors on all terminal types
-
-        // construct dictionary & UI objects
-        //  ToDo - possibly create as singletons?
-        // WordleDictionary dictionary = new WordleDictionary();
-        // GuessValidation guessValidation = new GuessValidation();
-        // GuessEvaluation guessEval = new GuessEvaluation();
-
         /**
          * To transition to WebUI interface - 3 phases
          *   construct the game incl. picking the secret word (WordleGame constructor)
@@ -43,7 +32,6 @@ public class Main {
         WordleUI ui = new WordleUI();
 
         GuessEvaluation.Result[] results;    // to pass into the UI
-        // boolean userWon = false;  -- replace with call to guessResults
 
         // Display intro information
         ui.writeMessage(WORDLE_INTRO);
@@ -55,29 +43,37 @@ public class Main {
 
         /*
          *                     Main game loop
-         *        while user hasn't guessed the secret word or exhausted their guesses
-         *   getUserGuess()
-         *   check isWordValid(), if not print error message, and continue to next guess
-         *   change guess to uppercase, trim whitespace
-         *   evaluate the guess & print the results (color coded)
+         *  Two phases
+         *     processGuess() - returns data class GuessResult
+         *     getGameStatus() - returns if user won &/or if game is over
+         *
+         *       while user hasn't guessed the secret word or exhausted their guesses
+         * getUserGuess from the UI & send to the game to evaluate
+         *   if guess is NOT valid, print error message, and continue to next guess
+         *   if guess valid print the color coded results
          *   if user won - print win message & exit game loop
+         *   else if user lost - print lose message & exit game loop
          */
-        GuessResult guessResult = null;
-        while (!game.isGameOver()) {
+        do {
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-            guessResult = game.processGuess(userGuess);
+            GuessResult guessResult = game.processGuess(userGuess);
             if (guessResult.getGuessStatus() == GuessResult.GuessStatus.INVALID) {
-                ui.writeMessage(INVALID_ENTRY);
+                ui.writeMessage(guessResult.getUserMessage());
+                continue;
             }
             results = guessResult.getGuessEval();
             ui.printGuessResult(userGuess, results);
-            if (guessResult.isGuessCorrect()) {
-                ui.writeMessage(WINNER);
+
+            // now get the game status - captures if player won or if game over & player lost
+            GameStatus gameStatus = game.getGameStatus();
+            if (gameStatus.getUserWon()) {
+                ui.writeMessage(gameStatus.getUserMessage());
                 break;   // user won the game,
             }
-        }  // end main game loop
-        if (guessResult.isGuessCorrect() == false) {
-            ui.writeMessage(LOSER + game.getSecretWord());
-        }
+            else if (gameStatus.getGameOver()) {
+                ui.writeMessage(gameStatus.getUserMessage() + gameStatus.getSecretWord());
+                break;
+            }
+        }  while (!game.isGameOver());  // end main game loop, redundant ...
     }
 }

@@ -1,20 +1,25 @@
 package org.fdu;
 
+/**
+ * Data Class for processing user guesses
+ * Defines an ENUM for guess status = VALID or INVALID
+ * Three data elements:
+ *     guessStatus - VALID or INVALID
+ *     guessEvaluation - array of Result enums denoting color of each character in guess
+ *     userMessage - message to display to user with this guess (e.g. Invalid Guess)
+ */
 public class GuessResult {
     public enum GuessStatus {VALID, INVALID};
 
     private static GuessStatus guessStatus;
     private static GuessEvaluation.Result[] guessEval;
-    private static boolean isGuessCorrect;
     private static String userMessage;   // message to send to user
 
     GuessResult(GuessStatus guessStatus,
                 GuessEvaluation.Result[] evaluation,
-                boolean isGuessCorrect,
                 String userMessage) {
         this.guessStatus = guessStatus;
         this.guessEval = evaluation;
-        this.isGuessCorrect = isGuessCorrect;
         this.userMessage = userMessage;
     }
 
@@ -24,9 +29,6 @@ public class GuessResult {
     }
     GuessEvaluation.Result[] getGuessEval() {
         return guessEval;
-    }
-    boolean isGuessCorrect() {
-        return isGuessCorrect;
     }
     String getUserMessage() {
         return userMessage;
