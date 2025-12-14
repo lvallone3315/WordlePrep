@@ -54,6 +54,7 @@
                 </configuration>
             </plugin>
             <!-- Add this plugin configuration to build the fat JAR -->
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -65,8 +66,9 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <transformers>
+                            <transformers> -->
                                 <!-- This transformer specifies the fully qualified name of your main class -->
+                                <!--  See above - commenting out shade fat jar for now
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.fdu.Main</mainClass>
                                 </transformer>
@@ -74,7 +76,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

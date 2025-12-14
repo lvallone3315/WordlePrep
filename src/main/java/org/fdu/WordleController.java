@@ -8,6 +8,6 @@ public class WordleController {
 
     @GetMapping("/wordle")
     public String intro() {
-        return "Welcome to Wordle (Web Spike)";
+        return "Welcome to Wordle (Web Spike)  Version 0.2";
     }
 }
