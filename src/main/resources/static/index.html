@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FDU Wordle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #guessInput {
+            width: 60px;
+            text-transform: uppercase;
+        }
+        .result {
+            margin-top: 10px;
+        }
+        .GRAY { color: gray; }
+        .YELLOW { color: goldenrod; }
+        .GREEN { color: green; }
+    </style>
+</head>
+<body>
+<h1>FDU Wordle</h1>
+<p>Enter your 5-letter guess:</p>
+<input id="guessInput" maxlength="5">
+<button onclick="sendGuess()">Guess</button>
+<button onclick="reset()">Reset</button>
+
+<div id="messages"></div>
+<div id="results"></div>
+
+
+
+
+<script>
+    async function reset() {
+        const response = await fetch(`/api/wordle/reset`, { method: 'POST' });
+        const data = await response.json();
+    }
+    async function sendGuess() {
+        const guess = document.getElementById("guessInput").value.trim();
+        if (!guess) return;
+
+        const response = await fetch(`/api/wordle/guess?guess=${guess}`, { method: 'POST' });
+        const data = await response.json();
+
+        // Display guess result
+        const resultsDiv = document.getElementById("results");
+        const guessEval = data.guessResult.guessEval || [];
+        const row = guessEval.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
+        const div = document.createElement('div');
+        div.className = "result";
+        div.innerHTML = row;
+        resultsDiv.appendChild(div);
+
+        // Display game status messages
+        const messagesDiv = document.getElementById("messages");
+        if (data.guessResult.guessStatus == "INVALID") {
+            messagesDiv.innerHTML = "<strong>ERROR! Words must contain alphas only</strong>";
+        } else if (data.gameStatus.userWon) {
+            messagesDiv.innerHTML = "<strong>Congratulations! You guessed the word!</strong>";
+        } else if (data.gameStatus.gameOver) {
+            messagesDiv.innerHTML = `<strong>Game Over! The word was ${data.gameStatus.secretWord}</strong>`;
+        } else {
+            messagesDiv.innerHTML = ``;
+        }
+    }
+</script>
+</body>
+</html>

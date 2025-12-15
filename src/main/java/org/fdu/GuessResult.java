@@ -10,8 +10,8 @@ package org.fdu;
 public class GuessResult {
     public enum GuessStatus {VALID, INVALID};
 
-    private static GuessStatus guessStatus;
-    private static GuessEvaluation.Result[] guessEval;
+    private GuessStatus guessStatus;
+    private GuessEvaluation.Result[] guessEval;
 
     GuessResult(GuessStatus guessStatus,
                 GuessEvaluation.Result[] evaluation) {
@@ -20,10 +20,10 @@ public class GuessResult {
     }
 
     // public getters so JSON can access all of the private data elements
-    GuessStatus getGuessStatus() {
+    public GuessStatus getGuessStatus() {
         return guessStatus;
     }
-    GuessEvaluation.Result[] getGuessEval() {
+    public GuessEvaluation.Result[] getGuessEval() {
         return guessEval;
     }
 }

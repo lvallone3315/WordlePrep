@@ -44,6 +44,7 @@ public class WordleGame {
      */
     public GuessResult processGuess(String userGuess) {
         // ToDo: add check here for game over - e.g. add another GuessStatus enum = GameOver
+        System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
         if (!guessValidation.isWordValid(userGuess)) {
             return new GuessResult(GuessResult.GuessStatus.INVALID, null);
         }
