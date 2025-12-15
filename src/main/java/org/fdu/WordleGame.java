@@ -25,7 +25,7 @@ public class WordleGame {
 
     /**
      * these two methods will ultimately be unnecessary, but for now ..
-     * @return
+     * @return secret word
      */
     public String getSecretWord() {
         return secretWord;

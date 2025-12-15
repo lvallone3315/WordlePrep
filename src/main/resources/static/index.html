@@ -21,22 +21,28 @@
     </style>
 </head>
 <body>
+<center>
 <h1>FDU Wordle</h1>
 <p>Enter your 5-letter guess:</p>
-<input id="guessInput" maxlength="5">
-<button onclick="sendGuess()">Guess</button>
-<button onclick="reset()">Reset</button>
-
+    <form onsubmit="sendGuess(); return false;">
+        <input id="guessInput" maxlength="5">
+        <button type = "submit">Guess</button>
+        <button type = "button" onclick="resetGame()">ResetGame</button>
+    </form>
+</center>
 <div id="messages"></div>
 <div id="results"></div>
 
 
-
-
 <script>
-    async function reset() {
+    async function resetGame() {
         const response = await fetch(`/api/wordle/reset`, { method: 'POST' });
-        const data = await response.json();
+        await response.json();
+
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("messages").innerHTML = "";
+        document.getElementById("guessInput").value = "";
+        document.getElementById("guessInput").focus();
     }
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
