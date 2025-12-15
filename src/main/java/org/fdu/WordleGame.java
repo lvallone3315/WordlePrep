@@ -25,7 +25,7 @@ public class WordleGame {
 
     /**
      * these two methods will ultimately be unnecessary, but for now ..
-     * @return
+     * @return secret word
      */
     public String getSecretWord() {
         return secretWord;
@@ -44,6 +44,7 @@ public class WordleGame {
      */
     public GuessResult processGuess(String userGuess) {
         // ToDo: add check here for game over - e.g. add another GuessStatus enum = GameOver
+        System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
         if (!guessValidation.isWordValid(userGuess)) {
             return new GuessResult(GuessResult.GuessStatus.INVALID, null);
         }

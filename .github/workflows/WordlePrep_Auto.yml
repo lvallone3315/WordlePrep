@@ -29,7 +29,7 @@ jobs:
 
       - name: Build and Test with Maven
         # 'package' goal runs all phases up to 'package', including 'compile'
-        run: mvn -B package --file pom.xml
+        run: mvn -B clean package --file pom.xml
       - name: Archive test results (XML)
         if: always()
         uses: actions/upload-artifact@v4
