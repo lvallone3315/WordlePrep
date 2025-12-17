@@ -1,5 +1,9 @@
 package org.fdu;
 
+/**
+ * Defines the escape codes for outputting colors to the console,
+ * Color names used by web interface to define html colors
+ */
 // Caution: reset color after each use
 public class ConsoleColors {
     public static final String RESET = "\u001B[0m";
