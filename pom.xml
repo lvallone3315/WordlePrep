@@ -16,8 +16,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -43,14 +42,14 @@
     <build>
         <plugins>
             <!-- ... (maven-compiler-plugin above) ... -->
-            <!-- Configure the standard compiler plugin for JDK 25 -->
+            <!-- Configure the standard compiler plugin for JDK 21 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.1</version>
                 <configuration>
                     <!-- Use the 'release' property for JDK 9+ projects -->
-                    <release>25</release>
+                    <release>21</release>
                 </configuration>
             </plugin>
             <!-- Add this plugin configuration to build the fat JAR -->

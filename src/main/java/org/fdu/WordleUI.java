@@ -1,5 +1,7 @@
 package org.fdu;
 
+import java.util.Scanner;  // for console input
+
 public class WordleUI {
     public WordleUI() {}; // empty constructor
 
@@ -8,7 +10,7 @@ public class WordleUI {
      * @param message - text to be written to the console
      */
     public void writeMessage(String message) {
-        IO.print(message);
+        System.out.print(message);
     }
 
     /**
@@ -19,7 +21,9 @@ public class WordleUI {
         return getUserGuess("");
     }
     public String getUserGuess(String prompt) {
-        String readln = IO.readln(prompt);
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(prompt);
+        String readln = scanner.nextLine();
         return readln;
     }
 
@@ -33,23 +37,23 @@ public class WordleUI {
      */
     public void printGuessResult(String guess, GuessEvaluation.Result[] guessEval ) {
         for (int itr = 0; itr < guessEval.length; itr++) {
-            IO.print("\t\t");  // offset the text to improve readability
+            System.out.print("\t\t");  // offset the text to improve readability
             switch (guessEval[itr]) {
                 case GuessEvaluation.Result.GRAY:
-                    IO.print(ConsoleColors.GRAY + guess.charAt(itr));
+                    System.out.print(ConsoleColors.GRAY + guess.charAt(itr));
                     break;
                 case GuessEvaluation.Result.GREEN:
-                    IO.print(ConsoleColors.GREEN + guess.charAt(itr));
+                    System.out.print(ConsoleColors.GREEN + guess.charAt(itr));
                     break;
                 case GuessEvaluation.Result.YELLOW:
-                    IO.print(ConsoleColors.YELLOW + guess.charAt(itr));
+                    System.out.print(ConsoleColors.YELLOW + guess.charAt(itr));
                     break;
                 default:
-                    IO.print(ConsoleColors.RED + guess.charAt(itr));
+                    System.out.print(ConsoleColors.RED + guess.charAt(itr));
                     break;
             }
         }
-        IO.print(ConsoleColors.RESET);
+        System.out.print(ConsoleColors.RESET);
     }  // end printGuessResult
 
 }
