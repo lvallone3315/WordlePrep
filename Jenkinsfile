@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'refs/heads/*',
+                git branch: 'master',
                     url: 'https://github.com/lvallone3315/WordlePrep.git'
             }
         }
