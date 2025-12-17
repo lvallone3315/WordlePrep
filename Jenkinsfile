@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'DevOPS-29-Wordle-Jenkins-pipeline-on-GCS',
+                git branch: 'refs/heads/*',
                     url: 'https://github.com/lvallone3315/WordlePrep.git'
             }
         }
