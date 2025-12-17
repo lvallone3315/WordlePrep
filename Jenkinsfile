@@ -9,8 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/lvallone3315/WordlePrep.git'
+                checkout scm
             }
         }
 
