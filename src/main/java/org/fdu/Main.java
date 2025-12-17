@@ -17,7 +17,7 @@ public class Main {
                   Gray   - letter is NOT in the word
               """;
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
-    private static final String INVALID_ENTRY = "Invalid entry, please re-enter your guess";
+    private static final String INVALID_ENTRY = "Invalid entry!!  Please re-enter your guess";
     private static final String WINNER = "\n\nCongratulations!  You are the Wordle Champ of the day";
     private static final String LOSER = "\n\nSorry!  You didn't guess the word, the word was: ";
 
