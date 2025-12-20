@@ -7,8 +7,8 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = ''
-        SERVER_PORT = ''
+        DEPLOY_DIR = 'UNSET'
+        SERVER_PORT = 'UNSET'
         APP_NAME = 'WordlePrep.jar'
     }
 
@@ -60,19 +60,23 @@ pipeline {
                 sh '''
                 set -e
 
-                JAR_SOURCE=$(ls target/*.jar | head -n 1)
+                if (env.DEPLOY_DIR == 'UNSET') {
+                    error "DEPLOY_DIR was never configured - abortng deployment"
+                } else {
+                    JAR_SOURCE=$(ls target/*.jar | head -n 1)
 
-                echo "Stopping existing app (if running)..."
-                pkill -f "$DEPLOY_DIR/$APP_NAME" || true
+                    echo "Stopping existing app (if running)..."
+                    pkill -f "$DEPLOY_DIR/$APP_NAME" || true
 
-                echo "Deploying new JAR..."
-                cp "$JAR_SOURCE" "$DEPLOY_DIR/$APP_NAME"
+                    echo "Deploying new JAR..."
+                    cp "$JAR_SOURCE" "$DEPLOY_DIR/$APP_NAME"
 
-                echo "Starting app on port $SERVER_PORT..."
-                nohup java -jar "$DEPLOY_DIR/$APP_NAME" \
-                    --server.port=$SERVER_PORT \
-                    > "$DEPLOY_DIR/wordle.log" 2>&1 &
-                '''
+                    echo "Starting app on port $SERVER_PORT..."
+                    nohup java -jar "$DEPLOY_DIR/$APP_NAME" \
+                        --server.port=$SERVER_PORT \
+                        > "$DEPLOY_DIR/wordle.log" 2>&1 &
+                    '''
+                }
             }
         }
     }
