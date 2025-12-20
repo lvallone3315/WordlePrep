@@ -37,7 +37,7 @@ pipeline {
             }
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') {
+                    if (env.BRANCH_NAME == 'master') {
                         env.DEPLOY_DIR = '/opt/wordle-app'
                         env.SERVER_PORT = '8081'
                     } else {
