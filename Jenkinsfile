@@ -7,8 +7,6 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = 'UNSET'
-        SERVER_PORT = 'UNSET'
         APP_NAME = 'WordlePrep.jar'
     }
 
@@ -65,7 +63,7 @@ pipeline {
             }
             steps {
                 script {
-                    if (env.DEPLOY_DIR == 'UNSET') {
+                    if (env.DEPLOY_DIR == '') {
                         error "DEPLOY_DIR was never configured - abortng deployment"
                     }
                 }
