@@ -6,6 +6,12 @@ pipeline {
         jdk 'JDK21'
     }
 
+    environment {
+        DEPLOY_DIR = ''
+        SERVER_PORT = ''
+        APP_NAME = 'WordlePrep.jar'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -25,19 +31,48 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Configure Deployment') {
+            when {
+                not { changeRequest() }   // ❗ never deploy PRs
+            }
             steps {
-                echo "Deploying JAR..."
-                sh 'nohup java -jar target/*.jar > app.log 2>&1 &'
+            // strategy - updates to master deploy to wordle-app on port 8081
+            //    updates on any other branch deploy to wordle-app-test on port 8082
+                script {
+                    if (env.BRANCH_NAME == 'master') {
+                        env.DEPLOY_DIR = '/opt/wordle-app'
+                        env.SERVER_PORT = '8081'
+                    } else {
+                        env.DEPLOY_DIR = '/opt/wordle-app-test'
+                        env.SERVER_PORT = '8082'
+                    }
 
-                // Copy JAR to deployment folder - note changed owner of /opt/wordle-app to jenkins
-                sh 'cp target/WordlePrep-1.0-SNAPSHOT.jar /opt/wordle-app/WordlePrep.jar'
+                    echo "Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR} on port ${env.SERVER_PORT}"
+                }
+            }
+        }
 
-                // Stop currently running app (ignore errors if not running)
-                // sh 'pkill -f WordlePrep.jar || true'
+        stage('Deploy') {
+            when {
+                not { changeRequest() }   // don't deploy PRs, deploy on the commits-pushes
+            }
+            steps {
+                sh '''
+                set -e
 
-                // Start the new app in background and log output
-                // sh 'nohup java -jar /opt/wordle-app/WordlePrep.jar --server.port=8081 > /opt/wordle-app/wordle.log 2>&1 &'
+                JAR_SOURCE=$(ls target/*.jar | head -n 1)
+
+                echo "Stopping existing app (if running)..."
+                pkill -f "$DEPLOY_DIR/$APP_NAME" || true
+
+                echo "Deploying new JAR..."
+                cp "$JAR_SOURCE" "$DEPLOY_DIR/$APP_NAME"
+
+                echo "Starting app on port $SERVER_PORT..."
+                nohup java -jar "$DEPLOY_DIR/$APP_NAME" \
+                    --server.port=$SERVER_PORT \
+                    > "$DEPLOY_DIR/wordle.log" 2>&1 &
+                '''
             }
         }
     }
