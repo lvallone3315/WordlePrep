@@ -36,6 +36,8 @@ pipeline {
                 not { changeRequest() }   // ❗ never deploy PRs
             }
             steps {
+            // strategy - updates to master deploy to wordle-app on port 8081
+            //    updates on any other branch deploy to wordle-app-test on port 8082
                 script {
                     if (env.BRANCH_NAME == 'master') {
                         env.DEPLOY_DIR = '/opt/wordle-app'
@@ -52,7 +54,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                not { changeRequest() }
+                not { changeRequest() }   // don't deploy PRs, deploy on the commits-pushes
             }
             steps {
                 sh '''
