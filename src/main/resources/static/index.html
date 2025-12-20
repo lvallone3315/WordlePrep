@@ -38,13 +38,10 @@
 
 <script>
     async function resetGame() {
-        const response = await fetch(`/api/wordle/reset`, { method: 'POST' });
-        await response.json();
-
-        document.getElementById("results").innerHTML = "";
-        document.getElementById("messages").innerHTML = "";
-        document.getElementById("guessInput").value = "";
-        document.getElementById("guessInput").focus();
+        await fetch(`/api/wordle/reset`, { method: 'POST' });
+        clearMessages();
+        clearResults();
+        clearGuessInput();
     }
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
@@ -52,6 +49,7 @@
 
         const response = await fetch(`/api/wordle/guess?guess=${guess}`, { method: 'POST' });
         const data = await response.json();
+        clearMessages();           // clear any
 
         // Display guess result
         const resultsDiv = document.getElementById("results");
@@ -71,8 +69,6 @@
             messagesDiv.innerHTML = "<strong>Congratulations! You guessed the word!</strong>";
         } else if (data.gameStatus.gameOver) {
             messagesDiv.innerHTML = `<strong>Game Over! The word was ${data.gameStatus.secretWord}</strong>`;
-        } else {
-            messagesDiv.innerHTML = ``;
         }
     }  // end sendGuess
 
@@ -80,6 +76,14 @@
         const input = document.getElementById("guessInput");
         input.value = "";
         input.focus();
+    }
+
+    function clearMessages() {
+        document.getElementById("messages").innerHTML = "";
+    }
+
+    function clearResults() {
+        document.getElementById("results").innerHTML = "";
     }
 </script>
 </body>
