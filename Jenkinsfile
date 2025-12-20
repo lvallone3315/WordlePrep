@@ -60,6 +60,7 @@ pipeline {
                 script {
                     if (env.DEPLOY_DIR == 'UNSET') {
                         error "DEPLOY_DIR was never configured - abortng deployment"
+                    }
                 }
                 sh '''
                 set -e
