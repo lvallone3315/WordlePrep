@@ -39,15 +39,22 @@ pipeline {
             // strategy - updates to master deploy to wordle-app on port 8081
             //    updates on any other branch deploy to wordle-app-test on port 8082
                 script {
+                    // work with local variables to work around issues where directly setting environment vars in groovy get ignored
+                    def deployDir
+                    def serverPort
                     if (env.BRANCH_NAME == 'master') {
-                        env.DEPLOY_DIR = '/opt/wordle-app'
-                        env.SERVER_PORT = '8081'
+                        deployDir = '/opt/wordle-app'
+                        serverPort = '8081'
                     } else {
-                        env.DEPLOY_DIR = '/opt/wordle-app-test'
-                        env.SERVER_PORT = '8082'
+                        deployDir = '/opt/wordle-app-test'
+                        serverPort = '8082'
                     }
 
-                    echo "Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR} on port ${env.SERVER_PORT}"
+                    echo "Deploying branch ${env.BRANCH_NAME} to ${deployDir} on port ${serverPort}"
+
+                    env.DEPLOY_DIR = deployDir
+                    env.SERVER_PORT = serverPort
+                    echo "Env Vars: Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR} on port ${env.SERVER_PORT}"
                 }
             }
         }
