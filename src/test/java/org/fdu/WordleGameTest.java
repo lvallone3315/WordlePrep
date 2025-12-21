@@ -3,8 +3,14 @@ package org.fdu;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeAll.*;
 
 class WordleGameTest {
+
+    @BeforeAll
+    static void setup() {
+    }
 
     @Test
     void processInvalidGuesses() {
@@ -65,5 +71,20 @@ class WordleGameTest {
         assertTrue(status.getGameOver(), "mixed case secret word, game should be over");
         assertTrue(status.getUserWon(), "mixed case secret word, player should have won");
 
+    }
+
+    @Test
+    // make maximum number of allowed incorrect guesses, verify game is over
+    //   make one more guess after game is over and verify game still over
+    void isUserOutOfGuesses() {
+        WordleGame game = new WordleGame("LOCAL");
+        System.out.println("Verify guesses are counted properly");
+        assertFalse(game.isUserOutOfGuesses());  // initially not out of guesses
+        for (int itr = 0; itr < game.getMaxUserGuesses(); itr++) {
+            game.processGuess("ABCDE");
+        }
+        assertTrue(game.isUserOutOfGuesses());
+        game.processGuess("LOCAL");
+        assertTrue(game.isUserOutOfGuesses());   // should still be true
     }
 }

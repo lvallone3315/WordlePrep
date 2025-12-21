@@ -7,13 +7,17 @@ public class WordleGame {
     private final GuessValidation guessValidation = new GuessValidation();
     private final GuessEvaluation guessEval = new GuessEvaluation();
 
+    private final static int MAX_GUESSES = 6;
+
     private String secretWord;
+    private int numbGuessesTaken = 0;
     private boolean gameOver = false;
     private boolean userWon = false;
 
+
     /**
      * Two constructors
-     *   WordleGame() - selects a word from the dictionary
+     *   WordleGame() - selects a word from the dictionary (standard game play constructor)
      *   WordleGame(String) - sets the secret word to the selected string (for testing)
      */
     public WordleGame() {
@@ -48,6 +52,9 @@ public class WordleGame {
         if (!guessValidation.isWordValid(userGuess)) {
             return new GuessResult(GuessResult.GuessStatus.INVALID, null);
         }
+        //   user guess is valid
+        //     update guess counter, normalize the word (e.g. caps, no whitespace), check guess to secret word
+        numbGuessesTaken++;
         String normalizedUserGuess = guessValidation.normalizeWord(userGuess);
         GuessEvaluation.Result[] results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
 
@@ -58,7 +65,7 @@ public class WordleGame {
             gameOver = true;
             userWon = true;
         }
-        else if (guessEval.isUserOutOfGuesses()) {
+        else if (isUserOutOfGuesses()) {
             gameOver = true;
             userWon = false;  // unnecessary, but makes it clear
         }  // else - game remains in progress
@@ -72,5 +79,17 @@ public class WordleGame {
      */
     public GameStatus getGameStatus() {
         return new GameStatus(gameOver, userWon, secretWord);
+    }
+
+    public boolean isUserOutOfGuesses() {
+        return numbGuessesTaken >= MAX_GUESSES;
+    }
+
+    /**
+     * Parameterize limit on user guesses
+     * @return number of guesses user allowed before game is over
+     */
+    public int getMaxUserGuesses() {
+        return MAX_GUESSES;
     }
 }

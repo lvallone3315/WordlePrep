@@ -48,6 +48,7 @@ class GuessEvaluationTest {
     }
 
     @Test
+    // deprecated, as can now test through the game class
     void isUserOutOfGuesses() {
         System.out.println("Verify guesses are counted properly");
         assertFalse(guessEval.isUserOutOfGuesses());  // initially not out of guesses
