@@ -39,9 +39,8 @@
 <script>
     async function resetGame() {
         await fetch(`/api/wordle/reset`, { method: 'POST' });
-        clearMessages();
-        clearResults();
-        clearGuessInput();
+        clearGameDisplay();
+        setGameControls(true);
     }
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
@@ -49,7 +48,7 @@
 
         const response = await fetch(`/api/wordle/guess?guess=${guess}`, { method: 'POST' });
         const data = await response.json();
-        clearMessages();           // clear any
+        clearMessages();           // clear prior message
 
         // Display guess result
         const resultsDiv = document.getElementById("results");
@@ -67,10 +66,25 @@
             messagesDiv.innerHTML = "<strong>ERROR! Words must contain alphas only</strong>";
         } else if (data.gameStatus.userWon) {
             messagesDiv.innerHTML = "<strong>Congratulations! You guessed the word!</strong>";
+            setGameControls(false);
         } else if (data.gameStatus.gameOver) {
             messagesDiv.innerHTML = `<strong>Game Over! The word was ${data.gameStatus.secretWord}</strong>`;
+            setGameControls(false);
         }
     }  // end sendGuess
+
+    // a little permuted, object flag is disabled, but for clarity using true to mean enable game controls
+    function setGameControls(enabled) {
+        document.querySelector("button[type='submit']").disabled = !enabled;
+        document.getElementById("guessInput").disabled = !enabled;
+    }
+
+    // clear entire display, or individual helper functions to clear a display element
+    function clearGameDisplay() {
+        clearGuessInput();
+        clearMessages();
+        clearResults();
+    }
 
     function clearGuessInput() {
         const input = document.getElementById("guessInput");
