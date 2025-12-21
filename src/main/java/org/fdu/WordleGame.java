@@ -36,10 +36,10 @@ public class WordleGame {
 
     /**
      *   check if guess is valid,
-     *   normalize the guess, all caps & trimmed whitespace
-     *   evaluate the guess & return the color codes (enums) for each character in the results[]
+     *   normalize the guess, all caps and trimmed whitespace
+     *   evaluate the guess and return the color codes (enums) for each character in the results[]
      *   if user won - set the userWon flag
-     *   if game over - set the gameOver flag  (userWon & gameOver retrieved from getGameStatus())
+     *   if game over - set the gameOver flag  (userWon and gameOver retrieved from getGameStatus())
      * @return GuessResult - data class with: VALID/INVALID guess, color coded result enums
      */
     public GuessResult processGuess(String userGuess) {
