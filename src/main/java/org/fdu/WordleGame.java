@@ -83,7 +83,7 @@ public class WordleGame {
      *   and a message to display to the user
      */
     public GameStatus getGameStatus() {
-        return new GameStatus(gameOver, userWon, secretWord);
+        return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES);
     }
 
     public boolean isUserOutOfGuesses() {
