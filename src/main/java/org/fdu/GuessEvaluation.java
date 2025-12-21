@@ -17,14 +17,10 @@ import java.util.List;
 
 public class GuessEvaluation {
 
-    public static final int GUESS_LIMIT = 6;
 
-    // private data declarations
-    private int numGuesses = 0;    // tracks # of guesses the user has made
 
     // Empty constructor for now, in the future may allow configurable word size
     public GuessEvaluation() {
-        numGuesses = 0;
     }
 
     /**
@@ -52,9 +48,6 @@ public class GuessEvaluation {
 
         // validate both the userGuess & the secretWord (hopefully validated prior to calling)
         if (!GuessValidation.isWordValid(userGuess) ||  !GuessValidation.isWordValid(secretWord)) return resultArray;
-
-        // update guess count - if we got here, valid guess
-        numGuesses++;
 
         /*
          * approach: loop through each character in user guess,
@@ -95,15 +88,6 @@ public class GuessEvaluation {
 
         return resultArray;  // done - return the results
     }  // end evaluateGuess
-
-
-    /**
-     *  check if user has used all of their guesses
-     * @return - true - out of guesses
-     */
-    public boolean isUserOutOfGuesses() {
-        return numGuesses >= GUESS_LIMIT;
-    }
 
 
     /**
