@@ -87,4 +87,66 @@ class WordleGameTest {
         game.processGuess("LOCAL");
         assertTrue(game.isUserOutOfGuesses());   // should still be true
     }
+
+    @Test
+    //
+    void winOnLastGuess() {
+        WordleGame game = new WordleGame("FECAL");
+        for (int itr = 0; itr < (game.getMaxUserGuesses()-1); itr++) {
+            game.processGuess("ABCDE");
+        }
+        assertFalse(game.isUserOutOfGuesses(), "max - 1 guesses, user still should have a guess");  // user should be out of guesses, but also
+        GameStatus status = game.getGameStatus();
+        assertFalse(status.getUserWon(), "user should not have won");
+        assertFalse(status.getGameOver(), "game should not be over, user still has a guess");
+
+        // last guess - correctly guess the secret word
+        game.processGuess("FECAL");
+        assertTrue(game.isUserOutOfGuesses());  // user should be out of guesses, but also
+        status = game.getGameStatus();
+        assertTrue(status.getUserWon(), "user should have won on last move, but didn't?");
+        assertTrue(status.getGameOver(), "user won, but, game isn't over");
+    }
+
+    @Test
+        //
+    void testGuessCounter() {
+        WordleGame game = new WordleGame("TAKEN");
+        int guessCounter = 0;
+        // a few invalid tests - should not increment game counter
+        game.processGuess("BAD");
+        game.processGuess("BUN NY");
+        game.processGuess("@DAWN");
+        assertEquals(guessCounter, game.getNumGuessesTaken());
+        // now a few valid tests - should increment guess counter
+        game.processGuess("HORSE");  guessCounter++;
+        game.processGuess("PINTO");  guessCounter++;
+        game.processGuess("frank");  guessCounter++;
+        assertEquals(guessCounter, game.getNumGuessesTaken());
+        // another couple of invalid tests
+        game.processGuess("");
+        game.processGuess("SUPERCALIFRAG");
+        assertEquals(guessCounter, game.getNumGuessesTaken());
+        // and valid guesses until the max is hit, e.g. if max = 6, 3 more
+        for (int guessNum = guessCounter+1; guessNum <= game.getMaxUserGuesses(); guessNum++ ) {
+            assertFalse(game.isUserOutOfGuesses());  // do this before the guess
+            game.processGuess("lynda");  guessCounter++;
+            assertEquals(guessCounter, game.getNumGuessesTaken());
+        }
+        // user should be out of guesses now & game should be over
+        GameStatus status = game.getGameStatus();
+        assertFalse(status.getUserWon(), "user should not have won");
+        assertTrue(status.getGameOver(), "game should be over, but isn't");
+
+        // now game is over - additional guesses should not be accepted
+        //   guessCounter should be at max, verify anyway
+        //   guess the secret word, but nothing should change
+        //     # guesses taken, user hasn't won & game is still over
+        assertEquals(guessCounter, game.getMaxUserGuesses());
+        game.processGuess("TAKEN");
+        assertEquals(guessCounter, game.getNumGuessesTaken(), "game over, guess counter should not have incremented");
+        status = game.getGameStatus();
+        assertFalse(status.getUserWon(), "game over before guess, user should not have won");
+        assertTrue(status.getGameOver(), "game is still over");
+    }
 }

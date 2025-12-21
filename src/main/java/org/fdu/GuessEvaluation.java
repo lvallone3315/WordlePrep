@@ -107,7 +107,7 @@ public class GuessEvaluation {
 
 
     /**
-     * If ever letter in secret word matches corresponding guess, player has won
+     * If every letter in secret word matches corresponding guess, player has won
      * @return true - all characters match position, false otherwise
      */
     public boolean isGuessCorrect(String userGuess, String secretWord) {

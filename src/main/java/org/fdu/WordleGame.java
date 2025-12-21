@@ -10,7 +10,7 @@ public class WordleGame {
     private final static int MAX_GUESSES = 6;
 
     private String secretWord;
-    private int numbGuessesTaken = 0;
+    private int numGuessesTaken = 0;
     private boolean gameOver = false;
     private boolean userWon = false;
 
@@ -48,13 +48,16 @@ public class WordleGame {
      */
     public GuessResult processGuess(String userGuess) {
         // ToDo: add check here for game over - e.g. add another GuessStatus enum = GameOver
-        System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
+        if (gameOver) {
+            return new GuessResult(GuessResult.GuessStatus.INVALID, null);
+        }
+        // System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
         if (!guessValidation.isWordValid(userGuess)) {
             return new GuessResult(GuessResult.GuessStatus.INVALID, null);
         }
         //   user guess is valid
         //     update guess counter, normalize the word (e.g. caps, no whitespace), check guess to secret word
-        numbGuessesTaken++;
+        numGuessesTaken++;
         String normalizedUserGuess = guessValidation.normalizeWord(userGuess);
         GuessEvaluation.Result[] results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
 
@@ -69,6 +72,8 @@ public class WordleGame {
             gameOver = true;
             userWon = false;  // unnecessary, but makes it clear
         }  // else - game remains in progress
+
+        // return the results and game status for display
         return new GuessResult(GuessResult.GuessStatus.VALID, results);
     }
 
@@ -82,7 +87,7 @@ public class WordleGame {
     }
 
     public boolean isUserOutOfGuesses() {
-        return numbGuessesTaken >= MAX_GUESSES;
+        return getNumGuessesTaken() >= MAX_GUESSES;
     }
 
     /**
@@ -91,5 +96,13 @@ public class WordleGame {
      */
     public int getMaxUserGuesses() {
         return MAX_GUESSES;
+    }
+
+    /**
+     * For testing and future functionality, allow retrieval of # guesses taken
+     * @return number of guesses taken
+     */
+    public int getNumGuessesTaken() {
+        return numGuessesTaken;
     }
 }
