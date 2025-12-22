@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Main</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.fdu</a>
+</div>
+
+<h1>Coverage Summary for Class: Main (org.fdu)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Main</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.fdu;
+&nbsp;
+&nbsp;import org.fusesource.jansi.AnsiConsole;  // for colors
+&nbsp;
+&nbsp;//TIP To &lt;b&gt;Run&lt;/b&gt; code, press &lt;shortcut actionId=&quot;Run&quot;/&gt; or
+&nbsp;// click the &lt;icon src=&quot;AllIcons.Actions.Execute&quot;/&gt; icon in the gutter.
+<b class="nc">&nbsp;public class Main {</b>
+&nbsp;    private static final String WORDLE_INTRO = &quot;\t\t\tWelcome to FDU Wordle\n&quot;;
+&nbsp;      // ToDo - update to screen size independent (not sure what this means yet)
+&nbsp;    private static final String GAME_OVERVIEW = &quot;&quot;&quot;
+&nbsp;              
+&nbsp;              A five (5) letter US English word will be selected\s
+&nbsp;                your task is to guess the word in six (6) or fewer guesses (valid US English words only)\s
+&nbsp;                After each turn, the game will evaluate your guess as follows:\s
+&nbsp;                  Green  - letter is in the word &amp; in the correct position\s
+&nbsp;                  Yellow - letter is in the word, but not in the correct position\s
+&nbsp;                  Gray   - letter is NOT in the word
+&nbsp;              &quot;&quot;&quot;;
+&nbsp;    private static final String PROMPT_MESSAGE = &quot;\nYour guess (5 letter word)? &quot;;
+&nbsp;    private static final String INVALID_ENTRY = &quot;Invalid entry!!  Please re-enter your guess&quot;;
+&nbsp;    private static final String WINNER = &quot;\n\nCongratulations!  You are the Wordle Champ of the day&quot;;
+&nbsp;    private static final String LOSER = &quot;\n\nSorry!  You didn&#39;t guess the word, the word was: &quot;;
+&nbsp;
+&nbsp;
+&nbsp;    public static void main(String[] args) {
+&nbsp;
+&nbsp;        // AnsiConsole.systemInstall(); // to support colors on all terminal types
+&nbsp;        /**
+&nbsp;         * To transition to WebUI interface - 3 phases
+&nbsp;         *   construct the game incl. picking the secret word (WordleGame constructor)
+&nbsp;         *   get and process a guess (game.processGuess)
+&nbsp;         *   evaluate the results (GuessResult methods)
+&nbsp;         */
+<b class="nc">&nbsp;        WordleGame game = new WordleGame();  // create a new instance of game w/o UI</b>
+<b class="nc">&nbsp;        WordleUI ui = new WordleUI();</b>
+&nbsp;
+&nbsp;        GuessEvaluation.Result[] results;    // to pass into the UI
+&nbsp;
+&nbsp;        // Display intro information
+<b class="nc">&nbsp;        ui.writeMessage(WORDLE_INTRO);</b>
+<b class="nc">&nbsp;        ui.writeMessage(GAME_OVERVIEW);</b>
+&nbsp;        // String secretWord = dictionary.pickNewWord();
+&nbsp;
+&nbsp;        // debug help - ToDo: delete this
+<b class="nc">&nbsp;        ui.writeMessage(game.getSecretWord() + &quot;\n\n&quot;);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         *                     Main game loop
+&nbsp;         *  Two phases
+&nbsp;         *     processGuess() - returns data class GuessResult
+&nbsp;         *     getGameStatus() - returns if user won &amp;/or if game is over
+&nbsp;         *
+&nbsp;         *       while user hasn&#39;t guessed the secret word or exhausted their guesses
+&nbsp;         * getUserGuess from the UI &amp; send to the game to evaluate
+&nbsp;         *   if guess is NOT valid, print error message, and continue to next guess
+&nbsp;         *   if guess valid print the color coded results
+&nbsp;         *   if user won - print win message &amp; exit game loop
+&nbsp;         *   else if user lost - print lose message &amp; exit game loop
+&nbsp;         */
+&nbsp;        while (true) {  // as long as gameOver code works, no need to set a condition
+<b class="nc">&nbsp;            String userGuess = ui.getUserGuess(PROMPT_MESSAGE);</b>
+<b class="nc">&nbsp;            GuessResult guessResult = game.processGuess(userGuess);</b>
+<b class="nc">&nbsp;            if (guessResult.getGuessStatus() == GuessResult.GuessStatus.INVALID) {</b>
+<b class="nc">&nbsp;                ui.writeMessage(INVALID_ENTRY);</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            results = guessResult.getGuessEval();</b>
+<b class="nc">&nbsp;            ui.printGuessResult(userGuess, results);</b>
+&nbsp;
+&nbsp;            // now get the game status - captures if player won or if game over &amp; player lost
+<b class="nc">&nbsp;            GameStatus gameStatus = game.getGameStatus();</b>
+<b class="nc">&nbsp;            if (gameStatus.getUserWon()) {</b>
+<b class="nc">&nbsp;                ui.writeMessage(WINNER);</b>
+&nbsp;                break;   // user won the game,
+&nbsp;            }
+<b class="nc">&nbsp;            else if (gameStatus.getGameOver()) {</b>
+<b class="nc">&nbsp;                ui.writeMessage(LOSER + gameStatus.getSecretWord());</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-12-21 21:04</div>
+</div>
+</body>
+</html>

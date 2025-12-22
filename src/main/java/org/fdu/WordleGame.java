@@ -1,7 +1,19 @@
 package org.fdu;
 
-public class WordleGame {
+/**
+ * Create and control a single game of Wordle.  Processes user guess(es) and return results & game status.
+ *
+ * <p>
+ * Constructs a new game of Wordle.  Scope includes: processing the player's guess, tracking number of guesses
+ *   made and the maximum allowed.  Tracks state such as did the player win, is the game over.<br>
+ *   Provide access to the current status of the game (gameStatus).
+ * </p>
+ *
+ * @author Lee V
+ * @version 1.0
+ */
 
+public class WordleGame {
 
     private final WordleDictionary wordleDictionary = new WordleDictionary();
     private final GuessValidation guessValidation = new GuessValidation();
@@ -9,6 +21,7 @@ public class WordleGame {
 
     private final static int MAX_GUESSES = 6;
 
+    // game state variables
     private String secretWord;
     private int numGuessesTaken = 0;
     private boolean gameOver = false;
@@ -86,6 +99,10 @@ public class WordleGame {
         return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES);
     }
 
+    /**
+     * checks if player has used the maximum number of guesses
+     * @return true if player has used the maximum allowed guesses, false otherwise
+     */
     public boolean isUserOutOfGuesses() {
         return getNumGuessesTaken() >= MAX_GUESSES;
     }
