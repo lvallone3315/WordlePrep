@@ -71,7 +71,7 @@ pipeline {
                 sh '''
                 set -e
 
-                JAR_SOURCE= "target/$APP_NAME"
+                JAR_SOURCE=$(ls target/*.jar | head -n 1)
                 [ -f "$JAR_SOURCE" ] || { echo "JAR not found: $JAR_SOURCE"; exit 1; }
 
                 echo "Deploying new JAR, move to .tmp file first to ensure systemd sees complete JAR ..."
