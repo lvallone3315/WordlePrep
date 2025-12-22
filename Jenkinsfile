@@ -8,6 +8,7 @@ pipeline {
 
     environment {
         APP_NAME = 'WordlePrep.jar'
+        TEMP_APP_NAME = 'WordlePrep.jar.tmp'
     }
 
     stages {
@@ -64,24 +65,18 @@ pipeline {
             steps {
                 script {
                     if (env.DEPLOY_DIR == '') {
-                        error "DEPLOY_DIR was never configured - abortng deployment"
+                        error "DEPLOY_DIR was never configured - aborting deployment"
                     }
                 }
                 sh '''
                 set -e
 
-                JAR_SOURCE=$(ls target/*.jar | head -n 1)
+                JAR_SOURCE= "target/$APP_NAME"
+                [ -f "$JAR_SOURCE" ] || { echo "JAR not found: $JAR_SOURCE"; exit 1; }
 
-                echo "Stopping existing app (if running)..."
-                pkill -f "$DEPLOY_DIR/$APP_NAME" || true
-
-                echo "Deploying new JAR..."
-                cp "$JAR_SOURCE" "$DEPLOY_DIR/$APP_NAME"
-
-                echo "Starting app on port $SERVER_PORT..."
-                nohup java -jar "$DEPLOY_DIR/$APP_NAME" \
-                    --server.port=$SERVER_PORT \
-                    > "$DEPLOY_DIR/wordle.log" 2>&1 &
+                echo "Deploying new JAR, move to .tmp file first to ensure systemd sees complete JAR ..."
+                cp "$JAR_SOURCE" "$DEPLOY_DIR/$TEMP_APP_NAME"
+                mv "$DEPLOY_DIR/$TEMP_APP_NAME" "$DEPLOY_DIR/$APP_NAME"
                 '''
             }
         }
