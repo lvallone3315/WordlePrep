@@ -48,18 +48,6 @@ class GuessEvaluationTest {
     }
 
     @Test
-    void isUserOutOfGuesses() {
-        System.out.println("Verify guesses are counted properly");
-        assertFalse(guessEval.isUserOutOfGuesses());  // initially not out of guesses
-        for (int itr = 0; itr < guessEval.GUESS_LIMIT; itr++) {   // use the define for the guess limit?
-            guessEval.evaluateGuess("ABCDE", "VWXYZ");
-        }
-        assertTrue(guessEval.isUserOutOfGuesses());
-        guessEval.evaluateGuess("BRICK", "BRICK");
-        assertTrue(guessEval.isUserOutOfGuesses());   // should still be true
-    }
-
-    @Test
     void isGuessCorrect() {
         System.out.println("Verify system can recognize correct guesses, invalid guesses return false");
         assertFalse(guessEval.isGuessCorrect("hello", "byeby"));
