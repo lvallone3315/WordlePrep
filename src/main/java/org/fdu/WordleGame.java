@@ -7,7 +7,7 @@ public class WordleGame {
     private final GuessValidation guessValidation = new GuessValidation();
     private final GuessEvaluation guessEval = new GuessEvaluation();
 
-    private final static int MAX_GUESSES = 7;
+    private final static int MAX_GUESSES = 6;
 
     private String secretWord;
     private int numGuessesTaken = 0;
