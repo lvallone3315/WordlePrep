@@ -77,6 +77,6 @@ public class Main {
                 ui.writeMessage(LOSER + gameStatus.getSecretWord());
                 break;
             }
-        }
+        }  // end game loop
     }
 }
