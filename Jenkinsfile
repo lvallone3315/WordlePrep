@@ -77,6 +77,8 @@ pipeline {
                 echo "Deploying new JAR, move to .tmp file first to ensure systemd sees complete JAR ..."
                 cp "$JAR_SOURCE" "$DEPLOY_DIR/$TEMP_APP_NAME"
                 mv "$DEPLOY_DIR/$TEMP_APP_NAME" "$DEPLOY_DIR/$APP_NAME"
+                touch "$DEPLOY_DIR/.deploy-trigger"
+
                 '''
             }
         }
