@@ -104,6 +104,7 @@
         clearGameDisplay();
         setGameControls(true);
     }
+
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
         if (!guess) return;
@@ -162,5 +163,11 @@
         document.getElementById("results").innerHTML = "";
     }
 </script>
+<script>
+    window.onload = () => {
+        resetGame();
+    };
+</script>
+
 </body>
 </html>

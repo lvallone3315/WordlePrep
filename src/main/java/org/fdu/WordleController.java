@@ -4,6 +4,7 @@ import org.fdu.WordleGame;
 import org.fdu.GuessResult;
 import org.fdu.GameStatus;
 import org.fdu.GuessResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,13 +23,18 @@ public class WordleController {
     private WordleGame game = new WordleGame();   // start a new game
 
     @PostMapping("/reset")
-    public void reset() {
+    public void reset(HttpSession session) {
         System.out.println("Reset Wordle Game");
-        game = new WordleGame();
+        session.setAttribute("game", new WordleGame());
     }
 
     @PostMapping("/guess")
-    public GuessResponse processGuess(@RequestParam String guess) {
+    public GuessResponse guess(@RequestParam String guess, HttpSession session) {
+        WordleGame game = (WordleGame) session.getAttribute("game");
+        if (game == null) {
+            game = new WordleGame();
+            session.setAttribute("game", game);
+        }
         GuessResult guessResult = game.processGuess(guess);
         GameStatus status = game.getGameStatus();
         return new GuessResponse(guessResult, status);
