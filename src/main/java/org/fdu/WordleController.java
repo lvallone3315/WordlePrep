@@ -20,28 +20,45 @@ public class WordleController {
     }
     */
 
-    private WordleGame game = new WordleGame();   // start a new game
-
-    @PostMapping("/reset")
-    public void reset(HttpSession session) {
-        System.out.println("Reset Wordle Game");
-        session.setAttribute("game", new WordleGame());
-    }
-
-    @PostMapping("/guess")
-    public GuessResponse guess(@RequestParam String guess, HttpSession session) {
+    // helper function - get the currently running game, if none, create one
+    private WordleGame getGame(HttpSession session) {
         WordleGame game = (WordleGame) session.getAttribute("game");
         if (game == null) {
             game = new WordleGame();
             session.setAttribute("game", game);
         }
-        GuessResult guessResult = game.processGuess(guess);
-        GameStatus status = game.getGameStatus();
-        return new GuessResponse(guessResult, status);
+        return game;
     }
 
+    /**
+     * reset - creates a new wordle game instance
+     * @param session
+     */
+    @PostMapping("/reset")
+    public void reset(HttpSession session) {
+        session.setAttribute("game", new WordleGame());
+    }
+
+    /**
+     * Evaluate the users guess, and return the outcome of the guess itself and game changes
+     * @param guess
+     * @param session
+     * @return guessResponse including color coded letters and game status (e.g. over, winner)
+     */
+    @PostMapping("/guess")
+    public GuessResponse guess(@RequestParam String guess, HttpSession session) {
+        WordleGame game = getGame(session);
+        GuessResult guessResult = game.processGuess(guess);
+        return new GuessResponse(guessResult, game.getGameStatus());
+    }
+
+    /**
+     * Returns the game state (e.g. in-progress/game over, if player won, secret word, ...)
+     * @param session
+     * @return game state
+     */
     @GetMapping("/status")
-    public GameStatus getStatus() {
-        return game.getGameStatus();
+    public GameStatus getStatus(HttpSession session) {
+        return getGame(session).getGameStatus();
     }
 }
