@@ -4,18 +4,54 @@
     <meta charset="UTF-8">
     <title>FDU Wordle</title>
     <style>
+        /* Full page flex centering */
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        /* Game container */
+        .game-container {
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
             padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        form {
+            display: flex;
+            flex-direction: column; /* stack input + buttons vertically on phones */
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
         }
         #guessInput {
-            width: 60px;
+            width: 70%;
+            max-width: 120px;
+            font-size: 1rem;
             text-transform: uppercase;
+            padding: 6px;
+            text-align: center;
+        }
+        button {
+            padding: 6px 12px;
+            font-size: 1rem;
+            margin: 2px;
+            cursor: pointer;
         }
         /* Container for each guess row */
         .result {
-            margin-top: 10px;
+            margin-top: 8px;
             display: flex;
+            justify-content: center;
             gap: 6px;
             margin-bottom: 8px;
         }
@@ -36,26 +72,31 @@
             display: inline-block;
             font-family: sans-serif;
         }
+        /* Letter colors */
         .GRAY { color: gray; }
         .YELLOW { color: goldenrod; }
         .GREEN { color: green; }
+        /* Messages styling */
+        #messages {
+            margin-top: 8px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-<center>
+<div class="game-container">
 <h1>Welcome to FDU Wordle!</h1>
 <p>Enter your 5-letter guess:</p>
     <form onsubmit="sendGuess(); return false;">
-        <input id="guessInput" maxlength="5">
+        <input id="guessInput" maxlength="5" autofocus>
         <button type = "submit">Guess</button>
         <button type = "button" onclick="resetGame()">ResetGame</button>
     </form>
-<p></p>
 <div id="messages"></div>
-<p></p>
 <div id="results"></div>
-</center>
-
+</div>
+</body>
+</html>
 
 <script>
     async function resetGame() {
@@ -63,6 +104,7 @@
         clearGameDisplay();
         setGameControls(true);
     }
+
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
         if (!guess) return;
@@ -121,5 +163,11 @@
         document.getElementById("results").innerHTML = "";
     }
 </script>
+<script>
+    window.onload = () => {
+        resetGame();
+    };
+</script>
+
 </body>
 </html>
