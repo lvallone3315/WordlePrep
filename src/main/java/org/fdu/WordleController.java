@@ -6,6 +6,10 @@ import org.fdu.GameStatus;
 import org.fdu.GuessResponse;
 import jakarta.servlet.http.HttpSession;
 
+// used to return specific status
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +39,11 @@ public class WordleController {
      * @param session
      */
     @PostMapping("/reset")
-    public void reset(HttpSession session) {
-        session.setAttribute("game", new WordleGame());
+    public ResponseEntity<WordleGame> reset(HttpSession session) {
+        WordleGame game = new WordleGame();
+        session.setAttribute("game", game);
+        // Explicitly set the 201 Created status, default is 200 OK status
+        return ResponseEntity.status(HttpStatus.CREATED).body(game);
     }
 
     /**
