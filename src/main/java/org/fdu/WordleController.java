@@ -6,19 +6,23 @@ import org.fdu.GameStatus;
 import org.fdu.GuessResponse;
 import jakarta.servlet.http.HttpSession;
 
+// used to return specific status
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST APIs to the Web UI interface (e.g. html and js)
+ * RestController annotation - directs method return values to be converted to JSON/XML
+ * RequestMapping - routes incoming http requests to specific controller methods
+ *    class level defines a base path to all endpoints
+ */
 @RestController
 @RequestMapping("/api/wordle")
 public class WordleController {
-
-   /*  @GetMapping("/wordle")
-    public String intro() {
-        return "Welcome to Wordle (Web Spike)  Version 0.2";
-    }
-    */
 
     // helper function - get the currently running game, if none, create one
     private WordleGame getGame(HttpSession session) {
@@ -35,8 +39,11 @@ public class WordleController {
      * @param session
      */
     @PostMapping("/reset")
-    public void reset(HttpSession session) {
-        session.setAttribute("game", new WordleGame());
+    public ResponseEntity<WordleGame> reset(HttpSession session) {
+        WordleGame game = new WordleGame();
+        session.setAttribute("game", game);
+        // Explicitly set the 201 Created status, default is 200 OK status
+        return ResponseEntity.status(HttpStatus.CREATED).body(game);
     }
 
     /**
@@ -59,6 +66,18 @@ public class WordleController {
      */
     @GetMapping("/status")
     public GameStatus getStatus(HttpSession session) {
-        return getGame(session).getGameStatus();
+        WordleGame game = getGame(session);
+        // test cases can get all information from WordleGame, but for now, allow access to GameStatus methods
+        session.setAttribute("gameStatus", game.getGameStatus());
+        return game.getGameStatus();
     }
+
+    /*
+     * below was the starter code for this method, displaying Welcome on the brownser window
+     * demonstrating the html/js and controller were up and running
+     * @GetMapping("/wordle")
+     * public String intro() {
+     *    return "Welcome to Wordle (Web Spike)  Version 0.2";
+     * }
+     */
 }
