@@ -41,7 +41,7 @@ public class WordleGame {
     }
 
     /**
-     * these two methods will ultimately be unnecessary, but for now ..
+     * these methods are for testing,
      * @return secret word
      */
     public String getSecretWord() {
@@ -49,7 +49,8 @@ public class WordleGame {
     }
     public boolean isGameOver() {
         return gameOver;
-    }
+    } /** @return true if game is over */
+    public boolean didUserWin() { return userWon; }  /** @return true if the user won */
 
     /**
      *   check if guess is valid,

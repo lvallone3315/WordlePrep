@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST APIs to the Web UI interface (e.g. html and js)
+ * RestController annotation - directs method return values to be converted to JSON/XML
+ * RequestMapping - routes incoming http requests to specific controller methods
+ *    class level defines a base path to all endpoints
+ */
 @RestController
 @RequestMapping("/api/wordle")
 public class WordleController {
-
-   /*  @GetMapping("/wordle")
-    public String intro() {
-        return "Welcome to Wordle (Web Spike)  Version 0.2";
-    }
-    */
 
     // helper function - get the currently running game, if none, create one
     private WordleGame getGame(HttpSession session) {
@@ -66,6 +66,18 @@ public class WordleController {
      */
     @GetMapping("/status")
     public GameStatus getStatus(HttpSession session) {
-        return getGame(session).getGameStatus();
+        WordleGame game = getGame(session);
+        // test cases can get all information from WordleGame, but for now, allow access to GameStatus methods
+        session.setAttribute("gameStatus", game.getGameStatus());
+        return game.getGameStatus();
     }
+
+    /*
+     * below was the starter code for this method, displaying Welcome on the brownser window
+     * demonstrating the html/js and controller were up and running
+     * @GetMapping("/wordle")
+     * public String intro() {
+     *    return "Welcome to Wordle (Web Spike)  Version 0.2";
+     * }
+     */
 }
