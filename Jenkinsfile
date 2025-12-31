@@ -60,18 +60,12 @@ pipeline {
             // strategy - updates to master deploy to wordle-app
             //    updates on any other branch deploy to wordle-app-test
                 script {
-                    // work with local variables to work around issues where directly setting environment vars in groovy get ignored
-                    def deployDir
                     if (env.BRANCH_NAME == 'master') {
-                        deployDir = '/opt/wordle-app'
+                        env.DEPLOY_DIR = '/opt/wordle-app'
                     } else {
-                        deployDir = '/opt/wordle-app-test'
+                        env.DEPLOY_DIR = '/opt/wordle-app-test'
                     }
-
-                    echo "Deploying branch ${env.BRANCH_NAME} to ${deployDir}"
-
-                    env.DEPLOY_DIR = deployDir
-                    echo "Env Vars: Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR}"
+                    echo "Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR}"
                 }
             }
         }
@@ -98,7 +92,7 @@ pipeline {
 
                 # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
                 mkdir -p $DEPLOY_DIR/backups
-                cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${APP_VERSION}.jar"
+                cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-$APP_VERSION.jar"
 
                 touch "$DEPLOY_DIR/.deploy-trigger"
 
