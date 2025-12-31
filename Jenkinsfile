@@ -9,18 +9,24 @@ pipeline {
     environment {
         APP_NAME = 'WordlePrep.jar'
         TEMP_APP_NAME = 'WordlePrep.jar.tmp'
+        // Ensures the Maven Extension can see the branch/tag in Jenkins' "Detached HEAD" state
+        GIT_BRANCH = "${env.BRANCH_NAME}"
+        GIT_COMMIT_REV = "${env.GIT_COMMIT}"
+
+        // Initialize version to empty, will populate in build stage
+        APP_VERSION = ""
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'
+                // prior version - checkout scm
+                // 3. Ensure a "Full Clone" so the extension can see your Git Tags
+                checkout([$class: 'GitSCM',
+                    branches: scm.branches,
+                    userRemoteConfigs: scm.userRemoteConfigs,
+                    extensions: scm.extensions + [[$class: 'CloneOption', shallow: false, noTags: false, depth: 0]]
+                ])
             }
         }
 
@@ -29,6 +35,23 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
+        stage('Build') {
+            steps {
+                script {
+                // sh 'mvn clean package'
+                // 4. Capture the dynamic version from Maven into a Jenkins variable
+                    // Using double quotes for the PowerShell/Shell compatibility fix we discussed
+                    env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    echo "--- Building Wordle App Version: ${env.APP_VERSION} ---"
+
+                    // 5. Run the actual build
+                    sh "mvn clean package -DskipTests"
+                }
+            }
+        }
+
+
 
         stage('Configure Deployment') {
             when {
@@ -43,10 +66,10 @@ pipeline {
                     def serverPort
                     if (env.BRANCH_NAME == 'master') {
                         deployDir = '/opt/wordle-app'
-                        serverPort = '8081'
+                        serverPort = '8089'
                     } else {
                         deployDir = '/opt/wordle-app-test'
-                        serverPort = '8082'
+                        serverPort = '8081'
                     }
 
                     echo "Deploying branch ${env.BRANCH_NAME} to ${deployDir} on port ${serverPort}"
@@ -64,7 +87,7 @@ pipeline {
             }
             steps {
                 script {
-                    if (env.DEPLOY_DIR == '') {
+                    if (!env.DEPLOY_DIR) {
                         error "DEPLOY_DIR was never configured - aborting deployment"
                     }
                 }
@@ -77,6 +100,11 @@ pipeline {
                 echo "Deploying new JAR, move to .tmp file first to ensure systemd sees complete JAR ..."
                 cp "$JAR_SOURCE" "$DEPLOY_DIR/$TEMP_APP_NAME"
                 mv "$DEPLOY_DIR/$TEMP_APP_NAME" "$DEPLOY_DIR/$APP_NAME"
+
+                # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
+                mkdir -p $DEPLOY_DIR/backups
+                cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${APP_VERSION}.jar"
+
                 touch "$DEPLOY_DIR/.deploy-trigger"
 
                 '''
