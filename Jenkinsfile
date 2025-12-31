@@ -68,7 +68,7 @@ pipeline {
                         deployDir = '/opt/wordle-app-test'
                     }
 
-                    echo "Deploying branch ${env.BRANCH_NAME} to ${deployDir} on port ${serverPort}"
+                    echo "Deploying branch ${env.BRANCH_NAME} to ${deployDir}"
 
                     env.DEPLOY_DIR = deployDir
                     echo "Env Vars: Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR}"
