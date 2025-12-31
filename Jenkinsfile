@@ -39,13 +39,12 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                // sh 'mvn clean package'
-                // 4. Capture the dynamic version from Maven into a Jenkins variable
-                    // Using double quotes for the PowerShell/Shell compatibility fix we discussed
+                // Capture the dynamic version from Maven into a Jenkins variable
+                    // Using double quotes for PowerShell/Shell compatibility
                     env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
                     echo "--- Building Wordle App Version: ${env.APP_VERSION} ---"
 
-                    // 5. Run the actual build
+                    // Run the actual build
                     sh "mvn clean package -DskipTests"
                 }
             }
@@ -58,25 +57,21 @@ pipeline {
                 not { changeRequest() }   // ❗ never deploy PRs
             }
             steps {
-            // strategy - updates to master deploy to wordle-app on port 8081
-            //    updates on any other branch deploy to wordle-app-test on port 8082
+            // strategy - updates to master deploy to wordle-app
+            //    updates on any other branch deploy to wordle-app-test
                 script {
                     // work with local variables to work around issues where directly setting environment vars in groovy get ignored
                     def deployDir
-                    def serverPort
                     if (env.BRANCH_NAME == 'master') {
                         deployDir = '/opt/wordle-app'
-                        serverPort = '8089'
                     } else {
                         deployDir = '/opt/wordle-app-test'
-                        serverPort = '8081'
                     }
 
                     echo "Deploying branch ${env.BRANCH_NAME} to ${deployDir} on port ${serverPort}"
 
                     env.DEPLOY_DIR = deployDir
-                    env.SERVER_PORT = serverPort
-                    echo "Env Vars: Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR} on port ${env.SERVER_PORT}"
+                    echo "Env Vars: Deploying branch ${env.BRANCH_NAME} to ${env.DEPLOY_DIR}"
                 }
             }
         }
