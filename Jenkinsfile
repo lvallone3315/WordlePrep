@@ -96,7 +96,7 @@ pipeline {
 
                     # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
                     mkdir -p $DEPLOY_DIR/backups
-                    cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${globalAppVersion}.jar"
+                    cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${globalAppVersion}-b${env.BUILD_NUMBER}.jar"
 
                     # --- CLEANUP STEP ---
                     echo "Pruning old backups, keeping latest 2..."
