@@ -59,6 +59,12 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <!-- ... (maven-compiler-plugin above) ... -->
             <!-- Configure the standard compiler plugin for JDK 21 -->

@@ -19,6 +19,16 @@ class WordleGameTest {
     }
 
     @Test
+    // verifies there is a valid game version (doesn't include "unknown")
+    void getGameVersion() {
+        WordleGame game = new WordleGame("BIBLE");
+        GameStatus status = game.getGameStatus();
+        String gameVersion = status.getGameVersion();
+        System.out.println("Game version: " + gameVersion);
+        assertFalse(gameVersion.toLowerCase().contains("unknown"));
+    }
+
+    @Test
     void testInvalidGuesses() {
         WordleGame game = new WordleGame("BUGLE");
         GuessResult result;

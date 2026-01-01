@@ -40,17 +40,32 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                // Capture the dynamic version from Maven into a Jenkins variable
-                    // Using double quotes for PowerShell/Shell compatibility
-                    globalAppVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    def branchName = env.BRANCH_NAME ?: sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+
+                    if (branchName == 'master' || branchName == 'main') {
+                        // 1. Get the latest Git Tag
+                        try {
+                            globalAppVersion = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
+                            // Strip the 'v' if your tags look like v1.0.0
+                            globalAppVersion = globalAppVersion.replace('v', '')
+                        } catch (Exception e) {
+                            // Fallback if no tag exists yet
+                            globalAppVersion = "1.0.0-untagged"
+                        }
+                    } else {
+                        // 2. Format for branches (e.g., feature-logic-b42)
+                        def safeBranchName = branchName.replaceAll("/", "-")
+                        globalAppVersion = "${safeBranchName}-b${env.BUILD_NUMBER}"
+                    }
+
                     echo "--- Building Wordle App Version: ${globalAppVersion} ---"
 
-                    // Run the actual build
-                    sh "mvn clean package -DskipTests"
+                    // 3. Run the build and INJECT the version
+                    // This ensures your version.properties gets the correct string
+                    sh "mvn clean package -DskipTests -Dproject.version=${globalAppVersion}"
                 }
             }
         }
-
 
 
         stage('Configure Deployment') {
@@ -96,7 +111,7 @@ pipeline {
 
                     # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
                     mkdir -p $DEPLOY_DIR/backups
-                    cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${globalAppVersion}-b${env.BUILD_NUMBER}.jar"
+                    cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${globalAppVersion}.jar"
 
                     # --- CLEANUP STEP ---
                     echo "Pruning old backups, keeping latest 2..."
