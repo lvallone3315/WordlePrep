@@ -83,6 +83,7 @@ pipeline {
 
                     sh """
                     set -e
+                    set -x
 
                     # Note - using sh double quotes, means we need to escape references to Linux vars/commands
                     #   see JAR_SOURCE
@@ -96,6 +97,10 @@ pipeline {
                     # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
                     mkdir -p $DEPLOY_DIR/backups
                     cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${globalAppVersion}.jar"
+
+                    # --- CLEANUP STEP ---
+                    echo "Pruning old backups, keeping latest 2..."
+                    cd "$DEPLOY_DIR/backups" && ls -t WordlePrep-*.jar | tail -n +3 | xargs rm -f -- || true
 
                     touch "$DEPLOY_DIR/.deploy-trigger"
 
