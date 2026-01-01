@@ -1,3 +1,7 @@
+// Initialize application version to empty, will populate in build stage
+def globalAppVersion = "unknown"
+
+// main pipeline
 pipeline {
     agent any
 
@@ -12,9 +16,6 @@ pipeline {
         // Ensures the Maven Extension can see the branch/tag in Jenkins' "Detached HEAD" state
         GIT_BRANCH = "${env.BRANCH_NAME}"
         GIT_COMMIT_REV = "${env.GIT_COMMIT}"
-
-        // Initialize version to empty, will populate in build stage
-        APP_VERSION = ""
     }
 
     stages {
@@ -41,8 +42,8 @@ pipeline {
                 script {
                 // Capture the dynamic version from Maven into a Jenkins variable
                     // Using double quotes for PowerShell/Shell compatibility
-                    env.APP_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-                    echo "--- Building Wordle App Version: ${env.APP_VERSION} ---"
+                    globalAppVersion = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    echo "--- Building Wordle App Version: ${globalAppVersion} ---"
 
                     // Run the actual build
                     sh "mvn clean package -DskipTests"
@@ -80,25 +81,25 @@ pipeline {
                         error "DEPLOY_DIR was never configured - aborting deployment"
                     }
 
-                    withEnv(["VERSION_FOR_SHELL=${env.APP_VERSION}"]) {
-                        sh '''
-                        set -e
+                    sh """
+                    set -e
 
-                        JAR_SOURCE=$(ls target/*.jar | head -n 1)
-                        [ -f "$JAR_SOURCE" ] || { echo "JAR not found: $JAR_SOURCE"; exit 1; }
+                    # Note - using sh double quotes, means we need to escape references to Linux vars/commands
+                    #   see JAR_SOURCE
+                    JAR_SOURCE=\$(ls target/*.jar | head -n 1)
+                    [ -f "\$JAR_SOURCE" ] || { echo "JAR not found: \$JAR_SOURCE"; exit 1; }
 
-                        echo "Deploying new JAR, move to .tmp file first to ensure systemd sees complete JAR ..."
-                        cp "$JAR_SOURCE" "$DEPLOY_DIR/$TEMP_APP_NAME"
-                        mv "$DEPLOY_DIR/$TEMP_APP_NAME" "$DEPLOY_DIR/$APP_NAME"
+                    echo "Deploying new JAR, move to .tmp file first to ensure systemd sees complete JAR ..."
+                    cp "\$JAR_SOURCE" "$DEPLOY_DIR/$TEMP_APP_NAME"
+                    mv "$DEPLOY_DIR/$TEMP_APP_NAME" "$DEPLOY_DIR/$APP_NAME"
 
-                        # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
-                        mkdir -p $DEPLOY_DIR/backups
-                        cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-$VERSION_FOR_SHELL.jar"
+                    # Create a versioned backup for easy rollback, create the backup dir if doesn't already exist
+                    mkdir -p $DEPLOY_DIR/backups
+                    cp "$DEPLOY_DIR/$APP_NAME" "$DEPLOY_DIR/backups/WordlePrep-${globalAppVersion}.jar"
 
-                        touch "$DEPLOY_DIR/.deploy-trigger"
+                    touch "$DEPLOY_DIR/.deploy-trigger"
 
-                        '''
-                    }
+                    """
                 }
             }
         }
