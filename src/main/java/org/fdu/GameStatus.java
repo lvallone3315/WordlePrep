@@ -13,13 +13,15 @@ public class GameStatus {
     private String secretWord;
     private int numGuesses;
     private int maxGuesses;
+    private String gameVersion;
 
-    GameStatus(boolean gameOver, boolean userWon, String secretWord, int numGuesses, int maxGuesses) {
+    GameStatus(boolean gameOver, boolean userWon, String secretWord, int numGuesses, int maxGuesses, String gameVersion) {
         this.gameOver = gameOver;
         this.userWon = userWon;
         this.secretWord = secretWord;
         this.numGuesses = numGuesses;
         this.maxGuesses = maxGuesses;
+        this.gameVersion = gameVersion;
     }
     public boolean getGameOver() {
         return gameOver;
@@ -32,4 +34,5 @@ public class GameStatus {
     }
     public int getNumGuesses() { return numGuesses; }
     public int getMaxGuesses() { return maxGuesses; }
+    public String getGameVersion() { return gameVersion; }
 }

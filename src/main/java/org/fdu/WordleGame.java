@@ -1,5 +1,8 @@
 package org.fdu;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Create and control a single game of Wordle.  Processes user guess(es) and return results & game status.
  *
@@ -26,6 +29,7 @@ public class WordleGame {
     private int numGuessesTaken = 0;
     private boolean gameOver = false;
     private boolean userWon = false;
+    private String gameVersion = "unknown";
 
 
     /**
@@ -35,9 +39,31 @@ public class WordleGame {
      */
     public WordleGame() {
         secretWord = wordleDictionary.pickNewWord();
+        storeGameVersion();
     }
     public WordleGame(String secretWord) {
         this.secretWord = secretWord;
+        storeGameVersion();
+    }
+
+    /*
+     * helper function to retrieve the version information and store it
+     */
+    private void storeGameVersion() {
+        // getResourceAsStream looks in src/main/resources (the classpath root)
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("version.properties")) {
+            if (input != null) {
+                Properties prop = new Properties();
+                prop.load(input);
+                this.gameVersion = prop.getProperty("wordle.version", "unknown");
+            } else {
+                // This happens if the file is missing from the JAR
+                this.gameVersion = "unknown-v-file-missing";
+            }
+        } catch (Exception ex) {
+            // Fallback if the file exists but is unreadable
+            this.gameVersion = "unknown-error";
+        }
     }
 
     /**
@@ -97,7 +123,7 @@ public class WordleGame {
      *   and a message to display to the user
      */
     public GameStatus getGameStatus() {
-        return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES);
+        return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES, gameVersion);
     }
 
     /**
