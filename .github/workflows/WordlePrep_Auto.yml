@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          # fetch full history for all tags and branches
+          fetch-depth: 0
 
       - name: Setup JDK 25    # using JDK 25 in maven file, maybe should adjust?
         uses: actions/setup-java@v5.1.0
