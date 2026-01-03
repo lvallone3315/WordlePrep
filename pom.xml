@@ -45,6 +45,10 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>4.0.1</version> <!-- match Spring Boot version -->
         </dependency>
+        <dependency>  <!-- required for Grafana -->
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
