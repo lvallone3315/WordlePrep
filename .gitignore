@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 .kotlin
 .git-versioned-pom.xml
+.env
 
 ### code coverage reports
 htmlReport/
