@@ -1,4 +1,5 @@
 package org.fdu;
+
 /**
  * GuessValidation Class
  * Codes validation rules including length (exactly 5 characters), allowable characters (a-z and A-Z)
@@ -37,4 +38,64 @@ public final class GuessValidation {
     public static String normalizeWord(String userGuess) {
         return userGuess.trim().toUpperCase();
     }
+
+    /**
+     *
+     * @param isValid - true if guess is valid, otherwise false (see reason for details)
+     * @param reason - details for guess validity, e.g. TOO_SHORT, or even VALID, if null - return UNKNOWN
+     */
+    public record ValidationResult(boolean isValid, ValidationReason reason) {
+        public ValidationResult {
+            if (reason == null) reason = ValidationReason.UNKNOWN;
+        }
+    }
+
+    /**
+     * refactored version of isWordValid() to return reason codes if guess doesn't meet game criteria
+     * @param userGuess - trimmed and then checked for length & contents (alpha only)
+     * @return - two fields, boolean - true (valid), false (invalid); ValidationReason (e.g. TOO_SHORT)
+     */
+    ValidationResult validateWord(String userGuess) {
+        String localUserGuess = userGuess.trim();   // trim leading and trailing white space
+        ValidationResult result;
+
+        // check length - must be an exact match, ie too long is no good either
+        if (localUserGuess.length() != WORD_LENGTH){
+            return new ValidationResult(false, ValidationReason.TOO_SHORT);
+        }
+
+        // verify alphabetic, ie a-z or A-Z, embedded blanks are invalid
+        for (int i = 0; i < localUserGuess.length(); i++) {
+            if (!Character.isLetter(localUserGuess.charAt(i))) {
+                return new ValidationResult(false, ValidationReason.NON_ALPHA);
+            }
+        }
+        // if we got here, met all requirements, return valid
+        return new ValidationResult(true, ValidationReason.VALID);  //
+    }
+
+    public enum ValidationReason {
+        VALID("VALID"),
+        TOO_SHORT("TOO_SHORT"),
+        NON_ALPHA("NON_ALPHA"),
+        UNKNOWN("UNKNOWN");
+
+        private final String code;
+        ValidationReason(String code) { this.code = code;}
+
+        public String getReasonString() {
+            return this.code;
+        }
+
+        public static ValidationReason getReasonEnum(String reasonString) {
+            for (ValidationReason reason : ValidationReason.values()) {
+                if (reason.code.equals(reasonString)) {
+                    return reason;
+                }
+            }
+            return UNKNOWN;
+        }
+    }    // end ValidationReason enum
 }
+
+
