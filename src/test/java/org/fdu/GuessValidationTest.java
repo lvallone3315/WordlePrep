@@ -1,20 +1,14 @@
 package org.fdu;
 
-import org.junit.jupiter.api.BeforeAll;
-
+import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.BeforeAll.*;
+
+import static org.fdu.GuessValidation.ValidationReason.*;
 
 class GuessValidationTest {
 
-    static GuessValidation validator;
-
-    @BeforeAll
-    static void setup() {
-        validator = new GuessValidation();
-    }
-
-    @org.junit.jupiter.api.Test
+    @Test
     void isWordValid() {
 
         System.out.println("define invalid and valid guesses, trailing V marks test cases expected to pass");
@@ -38,19 +32,23 @@ class GuessValidationTest {
         System.out.print(numeric + " "); System.out.println(nonAlpha);
 
         // ToDo: missing test case for control chars
-        assertFalse(validator.isWordValid(sixChars), "six char guess, should be invalid");
-        assertTrue(validator.isWordValid(fiveMixedCaseV), "mixed case, 5 letters, should be valid");
-        assertFalse(validator.isWordValid(fourChars), "four chars, should be invalid");
-        assertFalse(validator.isWordValid(numeric), "numeric, should be invalid");
-        assertTrue(validator.isWordValid(allUpperV), "upper case, 5 letters, should be valid");
-        assertFalse(validator.isWordValid(nonAlpha), "non-alphabetic chars, should be invalid");
-        assertFalse(validator.isWordValid(blank), "blank, should be invalid");
-        assertTrue(validator.isWordValid(allLowerV), "lower case, 5 letters, should be valid");
-        assertTrue(validator.isWordValid(leadingWhiteV), "leading & trailing white space, 5 letters, should be valid");
-        assertFalse(validator.isWordValid(inBetweenWhite), "white space in middle of chars, 5 letters, should be invalid");
+        assertFalse(GuessValidation.isWordValid(sixChars), "six char guess, should be invalid");
+        assertTrue(GuessValidation.isWordValid(fiveMixedCaseV), "mixed case, 5 letters, should be valid");
+        assertFalse(GuessValidation.isWordValid(fourChars), "four chars, should be invalid");
+        assertFalse(GuessValidation.isWordValid(numeric), "numeric, should be invalid");
+        assertTrue(GuessValidation.isWordValid(allUpperV), "upper case, 5 letters, should be valid");
+        assertFalse(GuessValidation.isWordValid(nonAlpha), "non-alphabetic chars, should be invalid");
+        assertFalse(GuessValidation.isWordValid(blank   ), "blank, should be invalid");
+        assertTrue(GuessValidation.isWordValid(allLowerV), "lower case, 5 letters, should be valid");
+        assertTrue(GuessValidation.isWordValid(leadingWhiteV), "leading & trailing white space, 5 letters, should be valid");
+        assertFalse(GuessValidation.isWordValid(inBetweenWhite), "white space in middle of chars, 5 letters, should be invalid");
+        // Testing a control character (ASCII 7 is "Bell")
+        String bellChar = "ABC" + (char)7 + "E";
+        assertFalse(GuessValidation.validateWord(bellChar).isValid(), "Control char should be invalid");
+        assertEquals(NON_ALPHA, GuessValidation.validateWord(bellChar).reason());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void normalizeWord() {
         System.out.println("verify leading and trailing white space is removed");
         System.out.println("  & all characters are converted to uppercase");
@@ -63,13 +61,57 @@ class GuessValidationTest {
         String leadingTrailingWhitePost = "LOCOM";
         String midWordWhitePre = "Bre ath";
         String midWordWhitePost = "BRE ATH";
-        assertEquals(leadingWhitePost, validator.normalizeWord(leadingWhitePre),
+        assertEquals(leadingWhitePost, GuessValidation.normalizeWord(leadingWhitePre),
                 "Leading white space not deleted");
-        assertEquals(trailingWhitePost, validator.normalizeWord(trailingWhitePre),
+        assertEquals(trailingWhitePost, GuessValidation.normalizeWord(trailingWhitePre),
                 "Trailing white space not deleted");
-        assertEquals(leadingTrailingWhitePost, validator.normalizeWord(leadingTrailingWhitePre),
+        assertEquals(leadingTrailingWhitePost, GuessValidation.normalizeWord(leadingTrailingWhitePre),
                 "Leading &/or trailing white space not deleted");
-        assertEquals(midWordWhitePost, validator.normalizeWord(midWordWhitePre),
+        assertEquals(midWordWhitePost, GuessValidation.normalizeWord(midWordWhitePre),
                 "mid-word white space not handled correctly");
+    }
+
+    @Test
+    void validateWordTest() {
+
+        System.out.println("define invalid and valid guesses, trailing V marks test cases expected to pass");
+        System.out.println("  Valid:  five alphabetic chars, case insensitive, leading & trailing white space ignored");
+        System.out.println("  Invalid: Numerics, control characters, special characters (e.g. hyphens, etc.), " +
+                "white space between letters");
+        System.out.println("All guesses return a record including Valid/Invalid and reasons");
+
+        String sixChars = "abcdef";
+        String fiveMixedCaseV = "xYZaB";
+        String fourChars = "LMNO";
+        String numeric = "AB1CD";
+        String nonAlpha = "A@_32";
+        String blank = "";
+        String allLowerV = "hello";
+        String allUpperV = "ABCDE";
+        String leadingWhiteV = "  PLATE  ";
+        String inBetweenWhite = "SH EP";
+
+        System.out.println("Example tests: ");
+        System.out.print(sixChars + " ");  System.out.print(fiveMixedCaseV + " ");
+        System.out.print(numeric + " "); System.out.println(nonAlpha);
+
+        assertFalse(GuessValidation.validateWord(sixChars).isValid(), "six char guess, should be invalid");
+        assertEquals(GuessValidation.validateWord(sixChars).reason(), INVALID_LENGTH);
+        assertTrue(GuessValidation.validateWord(fiveMixedCaseV).isValid(), "mixed case, 5 letters, should be valid");
+        assertEquals(GuessValidation.validateWord(fiveMixedCaseV).reason(), VALID);
+        assertFalse(GuessValidation.validateWord(fourChars).isValid(), "four chars, should be invalid");
+        assertEquals(GuessValidation.validateWord(fourChars).reason(), INVALID_LENGTH);
+        assertFalse(GuessValidation.validateWord(numeric).isValid(), "numeric, should be invalid");
+        assertEquals(GuessValidation.validateWord(numeric).reason(), NON_ALPHA);
+        assertTrue(GuessValidation.validateWord(allUpperV).isValid(), "upper case, 5 letters, should be valid");
+        assertFalse(GuessValidation.validateWord(nonAlpha).isValid(), "non-alphabetic chars, should be invalid");
+        assertEquals(GuessValidation.validateWord(nonAlpha).reason(), NON_ALPHA);
+        //  all blanks returned as too short
+        assertFalse(GuessValidation.validateWord(blank).isValid(), "blank, should be invalid");
+        assertEquals(GuessValidation.validateWord(blank).reason(), INVALID_LENGTH);
+        assertTrue(GuessValidation.validateWord(allLowerV).isValid(), "lower case, 5 letters, should be valid");
+        assertTrue(GuessValidation.validateWord(leadingWhiteV).isValid(), "leading & trailing white space, 5 letters, should be valid");
+        assertFalse(GuessValidation.validateWord(inBetweenWhite).isValid(), "white space in middle of chars, 5 letters, should be invalid");
+        assertEquals(GuessValidation.validateWord(inBetweenWhite).reason(), NON_ALPHA);
     }
 }

@@ -1,6 +1,6 @@
 package org.fdu;
 
-import org.fusesource.jansi.AnsiConsole;  // for colors
+import static org.fdu.GuessValidation.ValidationReason.*; // access to the GuessValidation reason code enum
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -17,7 +17,10 @@ public class Main {
                   Gray   - letter is NOT in the word
               """;
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
-    private static final String INVALID_ENTRY = "Invalid entry!!  Please re-enter your guess";
+    private static final String INVALID_ENTRY = "Invalid entry!!  Please re-enter your guess";   // used for unknowns
+    private static final String GAME_ALREADY_OVER = "Game Over!! No more guesses";
+    private static final String GUESS_LENGTH_INCORRECT = "Guess length is NOT 5 letters, Please re-enter";
+    private static final String GUESS_NON_ALPHA = "Guess must contain only letters (a-z or A-Z), Please re-enter";
     private static final String WINNER = "\n\nCongratulations!  You are the Wordle Champ of the day";
     private static final String LOSER = "\n\nSorry!  You didn't guess the word, the word was: ";
 
@@ -61,7 +64,8 @@ public class Main {
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
             GuessResult guessResult = game.processGuess(userGuess);
             if (guessResult.getGuessStatus() == GuessResult.GuessStatus.INVALID) {
-                ui.writeMessage(INVALID_ENTRY);
+                String message = getErrorMessage (guessResult.getGuessReason());
+                ui.writeMessage(message);
                 continue;
             }
             results = guessResult.getGuessEval();
@@ -78,5 +82,19 @@ public class Main {
                 break;
             }
         }  // end game loop
+    }  // end main method
+
+    private static String getErrorMessage(GuessValidation.ValidationReason reasonCode) {
+        // J17+ adds an enhanced "switch expression", cutting away boiler plate
+        // import of GuessValidation allows access to enums without the qualifiers
+        String message = switch (reasonCode) {
+            case INVALID_LENGTH -> GUESS_LENGTH_INCORRECT;
+            case GAME_OVER -> GAME_ALREADY_OVER;
+            case NON_ALPHA -> GUESS_NON_ALPHA;
+            default -> INVALID_ENTRY;
+        };
+        return message;
     }
-}
+}  // end main class
+
+

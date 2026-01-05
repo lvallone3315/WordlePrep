@@ -47,7 +47,8 @@ public class GuessEvaluation {
         Arrays.fill(resultArray, Result.GRAY);
 
         // validate both the userGuess & the secretWord (hopefully validated prior to calling)
-        if (!GuessValidation.isWordValid(userGuess) ||  !GuessValidation.isWordValid(secretWord)) return resultArray;
+        if (!GuessValidation.validateWord(userGuess).isValid() ||
+                !GuessValidation.validateWord(secretWord).isValid()) return resultArray;
 
         /*
          * approach: loop through each character in user guess,
@@ -95,7 +96,8 @@ public class GuessEvaluation {
      * @return true - all characters match position, false otherwise
      */
     public boolean isGuessCorrect(String userGuess, String secretWord) {
-        if (!GuessValidation.isWordValid(userGuess) ||  !GuessValidation.isWordValid(secretWord))
+        if (!GuessValidation.validateWord(userGuess).isValid()
+                ||  !GuessValidation.validateWord(secretWord).isValid())
             return false;  // validity check before proceeding
         for (int itr = 0; itr < secretWord.length(); itr++) {
             if (userGuess.charAt(itr) != secretWord.charAt(itr))

@@ -45,6 +45,18 @@ class GuessEvaluationTest {
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         expEvalResult = new GuessEvaluation.Result[] {GREEN, GRAY, GRAY, GRAY, GREEN};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
+
+        secretWord = "ABBEY";        guess = "BABES";
+        System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
+        expEvalResult = new GuessEvaluation.Result[] {YELLOW, YELLOW, GREEN, GREEN, GRAY};
+        assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
+
+        /* Bug identified by Gemini - ToDo create a bug ticket to fix
+        secretWord = "TABOO";        guess = "ROBOT";
+        System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
+        expEvalResult = new GuessEvaluation.Result[] {YELLOW, GRAY, GREEN, GREEN, YELLOW};
+        assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
+        */
     }
 
     @Test
