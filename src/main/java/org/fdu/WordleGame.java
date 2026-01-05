@@ -19,7 +19,6 @@ import java.util.Properties;
 public class WordleGame {
 
     private final WordleDictionary wordleDictionary = new WordleDictionary();
-    private final GuessValidation guessValidation = new GuessValidation();
     private final GuessEvaluation guessEval = new GuessEvaluation();
 
     private final static int MAX_GUESSES = 6;
@@ -89,16 +88,21 @@ public class WordleGame {
     public GuessResult processGuess(String userGuess) {
         // ToDo: add check here for game over - e.g. add another GuessStatus enum = GameOver
         if (gameOver) {
-            return new GuessResult(GuessResult.GuessStatus.INVALID, null);
+            return new GuessResult(GuessResult.GuessStatus.INVALID, null,
+                    GuessValidation.ValidationReason.GAME_OVER);
         }
+        //  normalize the word (e.g. caps, no whitespace) & validate if meets requirements
+        String normalizedUserGuess = GuessValidation.normalizeWord(userGuess);
+        var validation = GuessValidation.validateWord(normalizedUserGuess);
+
         // System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
-        if (!guessValidation.isWordValid(userGuess)) {
-            return new GuessResult(GuessResult.GuessStatus.INVALID, null);
+        if (!validation.isValid()) {
+            return new GuessResult(GuessResult.GuessStatus.INVALID, null,
+                    validation.reason());
         }
         //   user guess is valid
-        //     update guess counter, normalize the word (e.g. caps, no whitespace), check guess to secret word
+        //     update guess counter, check guess to secret word
         numGuessesTaken++;
-        String normalizedUserGuess = guessValidation.normalizeWord(userGuess);
         GuessEvaluation.Result[] results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
 
         // 4 scenarios - game isn't over - no message
@@ -114,7 +118,8 @@ public class WordleGame {
         }  // else - game remains in progress
 
         // return the results and game status for display
-        return new GuessResult(GuessResult.GuessStatus.VALID, results);
+        return new GuessResult(GuessResult.GuessStatus.VALID, results,
+                validation.reason() );
     }
 
     /**

@@ -55,13 +55,13 @@ public final class GuessValidation {
      * @param userGuess - trimmed and then checked for length & contents (alpha only)
      * @return - two fields, boolean - true (valid), false (invalid); ValidationReason (e.g. TOO_SHORT)
      */
-    ValidationResult validateWord(String userGuess) {
+    public static ValidationResult validateWord(String userGuess) {
         String localUserGuess = userGuess.trim();   // trim leading and trailing white space
         ValidationResult result;
 
         // check length - must be an exact match, ie too long is no good either
         if (localUserGuess.length() != WORD_LENGTH){
-            return new ValidationResult(false, ValidationReason.TOO_SHORT);
+            return new ValidationResult(false, ValidationReason.INVALID_LENGTH);
         }
 
         // verify alphabetic, ie a-z or A-Z, embedded blanks are invalid
@@ -76,8 +76,9 @@ public final class GuessValidation {
 
     public enum ValidationReason {
         VALID("VALID"),
-        TOO_SHORT("TOO_SHORT"),
+        INVALID_LENGTH("INVALID_LENGTH"),
         NON_ALPHA("NON_ALPHA"),
+        GAME_OVER("GAME_OVER"),
         UNKNOWN("UNKNOWN");
 
         private final String code;

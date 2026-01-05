@@ -47,7 +47,6 @@ public class WordleDictionary {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(dictionaryName);
              InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)) {
-            GuessValidation validator = new GuessValidation();
 
             if (is == null) {
                 throw new FileNotFoundException("Dictionary file not found");
@@ -55,8 +54,9 @@ public class WordleDictionary {
             // string should be valid and trimmed - but just to be safe
             String line;
             while ((line = reader.readLine()) != null) {
-                if (validator.isWordValid(line.toUpperCase().trim())) {
-                    dictionary.add(line.toUpperCase().trim());
+                String cleanedWord = line.toUpperCase().trim();
+                if (GuessValidation.validateWord(cleanedWord).isValid()) {
+                    dictionary.add(cleanedWord);
                 }
             }
             // if dictionary is empty - throw exception & use preloaded version
@@ -65,10 +65,9 @@ public class WordleDictionary {
             }
         } catch (IOException | NullPointerException e) {
             //  if we can't open the external dictionary, use the few words we defined above
+            //   on Gemini advice - trying the addAll method for arrays rather than an iteration loop
             e.printStackTrace();
-            for (int itr = 0; itr < smallWordSet.length; itr++) {
-                dictionary.add(smallWordSet[itr]);
-            }
+            dictionary.addAll(Arrays.asList(smallWordSet));
         }
     }
 

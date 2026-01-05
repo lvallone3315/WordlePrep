@@ -12,11 +12,26 @@ public class GuessResult {
 
     private GuessStatus guessStatus;
     private GuessEvaluation.Result[] guessEval;
+    private GuessValidation.ValidationReason guessReason;
 
     GuessResult(GuessStatus guessStatus,
                 GuessEvaluation.Result[] evaluation) {
         this.guessStatus = guessStatus;
         this.guessEval = evaluation;
+    }
+
+    /**
+     * Overload guessStatus to allow access to reason
+     * @param guessStatus
+     * @param evaluation
+     * @param validationReason
+     */
+    GuessResult(GuessStatus guessStatus,
+                GuessEvaluation.Result[] evaluation,
+                GuessValidation.ValidationReason validationReason) {
+        this.guessStatus = guessStatus;
+        this.guessEval = evaluation;
+        this.guessReason = validationReason;
     }
 
     // public getters so JSON can access all of the private data elements
@@ -26,4 +41,5 @@ public class GuessResult {
     public GuessEvaluation.Result[] getGuessEval() {
         return guessEval;
     }
+    public GuessValidation.ValidationReason getGuessReason() {return guessReason;}
 }
