@@ -142,8 +142,17 @@
 
         // Display game status messages
         const messagesDiv = document.getElementById("messages");
+        // if the guess is invalid, inform the user as to the reason the guess is invalid
         if (data.guessResult.guessStatus == "INVALID") {
-            messagesDiv.innerHTML = "<strong>ERROR! Words must contain alphas only</strong>";
+            if (data.guessResult.guessReason == "GAME_OVER")
+                messagesDiv.innerHTML = "<strong>Game already over, no more guesses allowed!</strong>";
+            else if (data.guessResult.guessReason == "INVALID_LENGTH")
+                messagesDiv.innerHTML = "<strong>Guess length incorrect, 5 alphabetic characters only!</strong>";
+            else if (data.guessResult.guessReason == "NON_ALPHA")
+                messagesDiv.innerHTML = "<strong>ERROR! Words must contain alphas only!</strong>";
+            else
+                messagesDiv.innerHTML = "<strong>Invalid Guess, please try again!</strong>";
+        // various game over scenarios - user won or user lost
         } else if (data.gameStatus.userWon) {
             messagesDiv.innerHTML = "<strong>Congratulations! You guessed the word!</strong>";
             setGameControls(false);

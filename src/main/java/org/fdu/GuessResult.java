@@ -14,24 +14,18 @@ public class GuessResult {
     private GuessEvaluation.Result[] guessEval;
     private GuessValidation.ValidationReason guessReason;
 
-    GuessResult(GuessStatus guessStatus,
-                GuessEvaluation.Result[] evaluation) {
-        this.guessStatus = guessStatus;
-        this.guessEval = evaluation;
-    }
-
     /**
-     * Overload guessStatus to allow access to reason
-     * @param guessStatus
-     * @param evaluation
-     * @param validationReason
+     * Replaced prior guessStatus to provide a reason for invalid guesses
+     * @param guessStatus - valid or invalid, see enum
+     * @param evaluation - for valid guesses, indicates status of each letter (G Y Gray)
+     * @param guessReason - indicating why the guess is not valid, see GuessValidation.ValidationReason enum
      */
     GuessResult(GuessStatus guessStatus,
                 GuessEvaluation.Result[] evaluation,
-                GuessValidation.ValidationReason validationReason) {
+                GuessValidation.ValidationReason guessReason) {
         this.guessStatus = guessStatus;
         this.guessEval = evaluation;
-        this.guessReason = validationReason;
+        this.guessReason = guessReason;
     }
 
     // public getters so JSON can access all of the private data elements

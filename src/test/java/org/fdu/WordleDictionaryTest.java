@@ -45,7 +45,8 @@ class WordleDictionaryTest {
         WordleDictionary badDictionary = new WordleDictionary("IDontExist.csv");
         System.out.println("checkNonExistentDictionary: Above exception expected");
         int size = badDictionary.getDictionarySize();
-        assertTrue((size > 0 & size < 100), "small dictionary NOT populated");
+        assertTrue((size > 0), "small dictionary NOT populated");
+        assertTrue((size < 100), "small dictionary NOT populated");
         // verify can get a non-blank word from the bad dictionary
         String secretWord = badDictionary.pickNewWord();
         assertNotEquals(secretWord, "", "No word returned from small dictionary");
