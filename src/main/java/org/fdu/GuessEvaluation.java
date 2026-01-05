@@ -92,7 +92,9 @@ public class GuessEvaluation {
 
 
     /**
-     * If every letter in secret word matches corresponding guess, player has won
+     * Checks exact match (letter and position) of user's guess and secret word.  If match, player has won.
+     * @param userGuess - normalized (case and whitespace) user word
+     * @param secretWord - dictionary word to be compared with the userGuess word
      * @return true - all characters match position, false otherwise
      */
     public boolean isGuessCorrect(String userGuess, String secretWord) {
