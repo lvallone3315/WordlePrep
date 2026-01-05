@@ -11,6 +11,7 @@ class GuessValidationTest {
     @Test
     void isWordValid() {
 
+        System.out.println("*** To Be DEPRECATED ***");
         System.out.println("define invalid and valid guesses, trailing V marks test cases expected to pass");
         System.out.println("  Valid:  five alphabetic chars, case insensitive, leading & trailing white space ignored");
         System.out.println("  Invalid: Numerics, control characters, special characters (e.g. hyphens, etc.), " +
@@ -42,15 +43,12 @@ class GuessValidationTest {
         assertTrue(GuessValidation.isWordValid(allLowerV), "lower case, 5 letters, should be valid");
         assertTrue(GuessValidation.isWordValid(leadingWhiteV), "leading & trailing white space, 5 letters, should be valid");
         assertFalse(GuessValidation.isWordValid(inBetweenWhite), "white space in middle of chars, 5 letters, should be invalid");
-        // Testing a control character (ASCII 7 is "Bell")
-        String bellChar = "ABC" + (char)7 + "E";
-        assertFalse(GuessValidation.validateWord(bellChar).isValid(), "Control char should be invalid");
-        assertEquals(NON_ALPHA, GuessValidation.validateWord(bellChar).reason());
+
     }
 
     @Test
     void normalizeWord() {
-        System.out.println("verify leading and trailing white space is removed");
+        System.out.println("*** verify leading and trailing white space is removed");
         System.out.println("  & all characters are converted to uppercase");
 
         String leadingWhitePre = "   Shuffling";
@@ -74,7 +72,7 @@ class GuessValidationTest {
     @Test
     void validateWordTest() {
 
-        System.out.println("define invalid and valid guesses, trailing V marks test cases expected to pass");
+        System.out.println("*** define invalid and valid guesses, trailing V marks test cases expected to pass");
         System.out.println("  Valid:  five alphabetic chars, case insensitive, leading & trailing white space ignored");
         System.out.println("  Invalid: Numerics, control characters, special characters (e.g. hyphens, etc.), " +
                 "white space between letters");
@@ -113,5 +111,32 @@ class GuessValidationTest {
         assertTrue(GuessValidation.validateWord(leadingWhiteV).isValid(), "leading & trailing white space, 5 letters, should be valid");
         assertFalse(GuessValidation.validateWord(inBetweenWhite).isValid(), "white space in middle of chars, 5 letters, should be invalid");
         assertEquals(GuessValidation.validateWord(inBetweenWhite).reason(), NON_ALPHA);
+        // Testing a control character (ASCII 7 is "Bell")
+        String bellChar = "ABC" + (char)7 + "E";
+        assertFalse(GuessValidation.validateWord(bellChar).isValid(), "Control char should be invalid");
+        assertEquals(NON_ALPHA, GuessValidation.validateWord(bellChar).reason());
+    }
+
+    @Test
+    void getReasonStringTest() {
+        System.out.println("*** Testing reason strings for ValidationReason enums, such as: invalid length: " + INVALID_LENGTH.getReasonString());
+        System.out.println("INVALID_LENGTH.name() " + INVALID_LENGTH.name() + "\n");
+
+        assertEquals("INVALID_LENGTH", INVALID_LENGTH.getReasonString(), "enum string doesn't match expected value");
+        assertEquals("VALID", VALID.getReasonString(), "enum string doesn't match expected value");
+        assertEquals("NON_ALPHA",  NON_ALPHA.getReasonString(), "enum string doesn't match expected value");
+        assertEquals("GAME_OVER",  GAME_OVER.getReasonString(), "enum string doesn't match expected value");
+        assertEquals("UNKNOWN",  UNKNOWN.getReasonString(), "enum string doesn't match expected value");
+    }
+
+    @Test
+    void getREasonEnumTest() {
+        System.out.println("*** Testing mapping of strings to enums match requirements\n");
+        assertEquals(VALID, getReasonEnum("VALID"));
+        assertEquals(INVALID_LENGTH, getReasonEnum("INVALID_LENGTH"));
+        assertEquals(NON_ALPHA, getReasonEnum("NON_ALPHA"));
+        assertEquals(GAME_OVER, getReasonEnum("GAME_OVER"));
+        assertEquals(UNKNOWN, getReasonEnum("UNKNOWN"));
+        assertEquals(UNKNOWN, getReasonEnum("garbage"));
     }
 }

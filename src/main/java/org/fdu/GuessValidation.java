@@ -74,6 +74,13 @@ public final class GuessValidation {
         return new ValidationResult(true, ValidationReason.VALID);  //
     }
 
+    /**
+     * ValidationReason includes: enum and code (ie ASCII string for the enum)
+     *   Currently - enum ASCII = enum.name()
+     *   ValidationReason constructor - creates each object and populates the String code
+     *   getReasonString() - returns String associated with the enum object
+     *   getReasonEnum() - returns enum object associated with the string, UNKNOWN enum if string not valid
+     */
     public enum ValidationReason {
         VALID("VALID"),
         INVALID_LENGTH("INVALID_LENGTH"),
