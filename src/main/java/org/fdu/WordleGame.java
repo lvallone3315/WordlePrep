@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Create and control a single game of Wordle.  Processes user guess(es) and return results & game status.
+ * Create and control a single game of Wordle.  Processes user guess(es); return results and game status.
  *
  * <p>
  * Constructs a new game of Wordle.  Scope includes: processing the player's guess, tracking number of guesses

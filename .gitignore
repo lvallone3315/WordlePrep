@@ -6,6 +6,9 @@ target/
 .git-versioned-pom.xml
 .env
 
+### javadocs
+javadocs
+
 ### code coverage reports
 htmlReport/
 html/
