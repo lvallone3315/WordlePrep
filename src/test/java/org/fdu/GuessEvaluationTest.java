@@ -51,12 +51,10 @@ class GuessEvaluationTest {
         expEvalResult = new GuessEvaluation.Result[] {YELLOW, YELLOW, GREEN, GREEN, GRAY};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
 
-        /* Bug identified by Gemini - ToDo create a bug ticket to fix
         secretWord = "TABOO";        guess = "ROBOT";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
-        expEvalResult = new GuessEvaluation.Result[] {YELLOW, GRAY, GREEN, GREEN, YELLOW};
+        expEvalResult = new GuessEvaluation.Result[] {GRAY, YELLOW, GREEN, GREEN, YELLOW};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
-        */
     }
 
     @Test
