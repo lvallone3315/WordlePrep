@@ -132,8 +132,8 @@
 
         // Display guess result
         const resultsDiv = document.getElementById("results");
-        const guessEval = data.guessResult.evaluation || [];
-        const row = guessEval.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
+        const evaluation = data.guessResult.evaluation || [];
+        const row = evaluation.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
         const div = document.createElement('div');
         div.className = "result";
         div.innerHTML = row;
