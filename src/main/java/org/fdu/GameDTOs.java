@@ -1,20 +1,25 @@
 package org.fdu;
 
 /**
- * Data Class for processing user guesses
+ * Data Class for processing user guesses and game state<p>
  *
- * Three DTOs (though one is a package of the other two)
- *     GameStatus - defines game state
- *     GuessResult - evaluation of the user's guess including failure reason if invalid
- *     GuessResponse - DTO packaging GameStatus and GuessResult
- *
+ * Three DTOs (Guess Response is a package of the other two) <br>
+ *     GameStatus - defines game state <br>
+ *     GuessResult - evaluation of the user's guess including failure reason if invalid <br>
+ *     GuessResponse - DTO packaging GameStatus and GuessResult <br>
+ *<p>
  * Defines an ENUM for guess status = VALID or INVALID
+ * <p>
+ * For code clarity, most classes that use one or more of the DTOs should import this class: org.fdu.GameDTOs.*
  */
 public class GameDTOs {
+    /**
+     * Enum describing if user's guess meets game requirements (VALID).  If not, INVALID.
+     */
     public enum GuessStatus {VALID, INVALID};
 
     /**
-     * Data Class for game status
+     * DTO (data transfer object) for game status
      * @param  gameOver - true if the game is over, true if the player lost or won.
      * @param  userWon - true if the player has won, false if the game is still running, or over and the player lost
      * @param secretWord - word the player is trying guess
