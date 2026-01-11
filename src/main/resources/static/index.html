@@ -166,12 +166,10 @@
         } else if (data.gameStatus.userWon) {
             messagesDiv.innerHTML = "<strong>Congratulations! You guessed the word!</strong>";
             setGameControls(false);
-            remainingGuesses = 0;
-            displayGuessesUsed(data.gameStatus.numGuesses);
+        // game over, but user hasn't won, number remaining guesses = 0
         } else if (data.gameStatus.gameOver) {
             messagesDiv.innerHTML = `<strong>Game Over! The word was ${data.gameStatus.secretWord}</strong>`;
             setGameControls(false);
-            remainingGuesses=0;
         }
         // if user won, print num guesses used, if not, display remaining guesses
         if (data.gameStatus.userWon)
