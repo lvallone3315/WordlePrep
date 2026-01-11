@@ -3,6 +3,9 @@ package org.fdu;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.fdu.GameDTOs.*;
+
+
 /**
  * Create and control a single game of Wordle.  Processes user guess(es); return results and game status.
  *
@@ -88,7 +91,7 @@ public class WordleGame {
     public GuessResult processGuess(String userGuess) {
         // ToDo: add check here for game over - e.g. add another GuessStatus enum = GameOver
         if (gameOver) {
-            return new GuessResult(GuessResult.GuessStatus.INVALID, null,
+            return new GuessResult(GuessStatus.INVALID, null,
                     GuessValidation.ValidationReason.GAME_OVER);
         }
         //  normalize the word (e.g. caps, no whitespace) & validate if meets requirements
@@ -97,7 +100,7 @@ public class WordleGame {
 
         // System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
         if (!validation.isValid()) {
-            return new GuessResult(GuessResult.GuessStatus.INVALID, null,
+            return new GuessResult(GuessStatus.INVALID, null,
                     validation.reason());
         }
         //   user guess is valid
@@ -118,7 +121,7 @@ public class WordleGame {
         }  // else - game remains in progress
 
         // return the results and game status for display
-        return new GuessResult(GuessResult.GuessStatus.VALID, results,
+        return new GuessResult(GuessStatus.VALID, results,
                 validation.reason() );
     }
 

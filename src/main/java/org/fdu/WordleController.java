@@ -1,9 +1,7 @@
 package org.fdu;
 
 import org.fdu.WordleGame;
-import org.fdu.GuessResult;
-import org.fdu.GameStatus;
-import org.fdu.GuessResponse;
+import org.fdu.GameDTOs.*;
 import jakarta.servlet.http.HttpSession;
 
 // used to return specific status
