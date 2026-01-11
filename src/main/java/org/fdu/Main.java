@@ -1,6 +1,7 @@
 package org.fdu;
 
 import static org.fdu.GuessValidation.ValidationReason.*; // access to the GuessValidation reason code enum
+import org.fdu.GameDTOs.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -63,22 +64,22 @@ public class Main {
         while (true) {  // as long as gameOver code works, no need to set a condition
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
             GuessResult guessResult = game.processGuess(userGuess);
-            if (guessResult.getGuessStatus() == GuessResult.GuessStatus.INVALID) {
-                String message = getErrorMessage (guessResult.getGuessReason());
+            if (guessResult.guessStatus() == GuessStatus.INVALID) {
+                String message = getErrorMessage (guessResult.guessReason());
                 ui.writeMessage(message);
                 continue;
             }
-            results = guessResult.getGuessEval();
+            results = guessResult.evaluation();
             ui.printGuessResult(userGuess, results);
 
             // now get the game status - captures if player won or if game over & player lost
             GameStatus gameStatus = game.getGameStatus();
-            if (gameStatus.getUserWon()) {
+            if (gameStatus.userWon()) {
                 ui.writeMessage(WINNER);
                 break;   // user won the game,
             }
-            else if (gameStatus.getGameOver()) {
-                ui.writeMessage(LOSER + gameStatus.getSecretWord());
+            else if (gameStatus.gameOver()) {
+                ui.writeMessage(LOSER + gameStatus.secretWord());
                 break;
             }
         }  // end game loop

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll.*;
 
+import org.fdu.GameDTOs.*;
+
 class WordleGameTest {
 
     @Test
@@ -12,10 +14,10 @@ class WordleGameTest {
         WordleGame game = new WordleGame("APPLE");
         GameStatus status = game.getGameStatus();
 
-        assertFalse(status.getGameOver());
-        assertFalse(status.getUserWon());
-        assertEquals(0, status.getNumGuesses());
-        assertEquals(game.getMaxUserGuesses(), status.getMaxGuesses());
+        assertFalse(status.gameOver());
+        assertFalse(status.userWon());
+        assertEquals(0, status.numGuesses());
+        assertEquals(game.getMaxUserGuesses(), status.maxGuesses());
     }
 
     @Test
@@ -23,7 +25,7 @@ class WordleGameTest {
     void getGameVersion() {
         WordleGame game = new WordleGame("BIBLE");
         GameStatus status = game.getGameStatus();
-        String gameVersion = status.getGameVersion();
+        String gameVersion = status.gameVersion();
         System.out.println("Game version: " + gameVersion);
         assertFalse(gameVersion.toLowerCase().contains("unknown"));
     }
@@ -39,49 +41,49 @@ class WordleGameTest {
         // invalid guess - shouldn't increment turn counter
         result = game.processGuess("BU LE");
         status = game.getGameStatus();
-        assertNotEquals(GuessResult.GuessStatus.VALID, result.getGuessStatus(),
+        assertNotEquals(GuessStatus.VALID, result.guessStatus(),
                 "white space in middle, should be invalid");
-        assertFalse(status.getGameOver());
-        assertEquals(ZERO_GUESS_COUNTER, status.getNumGuesses());
+        assertFalse(status.gameOver());
+        assertEquals(ZERO_GUESS_COUNTER, status.numGuesses());
 
         // invalid guess - six letter word
         result = game.processGuess("BUGLEs");
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.INVALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.INVALID, result.guessStatus(),
                 "6 letter guess, should be invalid");
-        assertFalse(status.getGameOver());
-        assertEquals(ZERO_GUESS_COUNTER, status.getNumGuesses());
+        assertFalse(status.gameOver());
+        assertEquals(ZERO_GUESS_COUNTER, status.numGuesses());
 
         // valid guess - just to mix things up here
         result = game.processGuess("abcde");
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.VALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.VALID, result.guessStatus(),
                 "lower case 5 letter guess, should be valid");
-        assertFalse(status.getGameOver());
-        assertNotEquals(ZERO_GUESS_COUNTER, status.getNumGuesses());  // since we now have a valid guess
+        assertFalse(status.gameOver());
+        assertNotEquals(ZERO_GUESS_COUNTER, status.numGuesses());  // since we now have a valid guess
 
         // invalid guess
         result = game.processGuess("he11o");
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.INVALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.INVALID, result.guessStatus(),
                 "mixed alphas and numerics, should be invalid");
-        assertFalse(status.getGameOver());
+        assertFalse(status.gameOver());
 
         // invalid guess
         result = game.processGuess("@bcde");
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.INVALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.INVALID, result.guessStatus(),
                 "special char, should be invalid");
-        assertFalse(status.getGameOver(), "game shouldn't be over");
-        assertFalse(status.getUserWon(), "user should not have won with above guess");
+        assertFalse(status.gameOver(), "game shouldn't be over");
+        assertFalse(status.userWon(), "user should not have won with above guess");
 
         // invalid guess - 6th total guess
         result = game.processGuess(" b!rdy");
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.INVALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.INVALID, result.guessStatus(),
                 "special char, should be invalid");
-        assertFalse(status.getGameOver(), "6 guesses, mostly invalid, game shouldn't be over");
-        assertFalse(status.getUserWon(), "user should not have won with above guesses");
+        assertFalse(status.gameOver(), "6 guesses, mostly invalid, game shouldn't be over");
+        assertFalse(status.userWon(), "user should not have won with above guesses");
     }
 
     @Test
@@ -96,18 +98,18 @@ class WordleGameTest {
         // valid guess with white space, validate number of guesses increments as well
         result = game.processGuess("  BGLEU  ");  guessCounter++;
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.VALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.VALID, result.guessStatus(),
                 "leading & trailing white space, should be valid ");
-        assertFalse(status.getGameOver());
-        assertEquals(status.getNumGuesses(), guessCounter);
+        assertFalse(status.gameOver());
+        assertEquals(status.numGuesses(), guessCounter);
 
         // valid - mixed case and leading white space
         result = game.processGuess("  bUGle");
         status = game.getGameStatus();
-        assertEquals(GuessResult.GuessStatus.VALID, result.getGuessStatus(),
+        assertEquals(GuessStatus.VALID, result.guessStatus(),
                 "mixed case, corret word, should be valid");
-        assertTrue(status.getGameOver(), "mixed case secret word, game should be over");
-        assertTrue(status.getUserWon(), "mixed case secret word, player should have won");
+        assertTrue(status.gameOver(), "mixed case secret word, game should be over");
+        assertTrue(status.userWon(), "mixed case secret word, player should have won");
     }
 
     @Test
@@ -134,16 +136,16 @@ class WordleGameTest {
         }
         assertFalse(game.isUserOutOfGuesses(), "max - 1 guesses, user should have a guess left");  // user should be out of guesses, but also
         GameStatus status = game.getGameStatus();
-        assertFalse(status.getUserWon(), "user should not have won");
-        assertFalse(status.getGameOver(), "game should not be over, user still has a guess");
+        assertFalse(status.userWon(), "user should not have won");
+        assertFalse(status.gameOver(), "game should not be over, user still has a guess");
 
         // last guess - correctly guess the secret word
         game.processGuess("FECAL");
         assertTrue(game.isUserOutOfGuesses());  // user should be out of guesses, but also
         status = game.getGameStatus();
-        assertEquals(status.getMaxGuesses(), game.getNumGuessesTaken(), "number of guesses!= max, should be");
-        assertTrue(status.getUserWon(), "user should have won on last move, but didn't?");
-        assertTrue(status.getGameOver(), "user won, but, game isn't over");
+        assertEquals(status.maxGuesses(), game.getNumGuessesTaken(), "number of guesses!= max, should be");
+        assertTrue(status.userWon(), "user should have won on last move, but didn't?");
+        assertTrue(status.gameOver(), "user won, but, game isn't over");
     }
 
     @Test
@@ -172,9 +174,9 @@ class WordleGameTest {
         }
         // user should be out of guesses now & game should be over
         GameStatus status = game.getGameStatus();
-        assertFalse(status.getUserWon(), "user should not have won");
-        assertTrue(status.getGameOver(), "game should be over, but isn't");
-        assertEquals(guessCounter, status.getMaxGuesses());
+        assertFalse(status.userWon(), "user should not have won");
+        assertTrue(status.gameOver(), "game should be over, but isn't");
+        assertEquals(guessCounter, status.maxGuesses());
 
         // now game is over - additional guesses should not be accepted
         //   guessCounter should be at max, verify anyway
@@ -183,8 +185,8 @@ class WordleGameTest {
         //   also verifying the status update instead of calling game directly
         game.processGuess("TAKEN");
         status = game.getGameStatus();
-        assertEquals(guessCounter, status.getNumGuesses(), "game over, guess counter should not have incremented");
-        assertFalse(status.getUserWon(), "game over before guess, user should not have won");
-        assertTrue(status.getGameOver(), "game is still over");
+        assertEquals(guessCounter, status.numGuesses(), "game over, guess counter should not have incremented");
+        assertFalse(status.userWon(), "game over before guess, user should not have won");
+        assertTrue(status.gameOver(), "game is still over");
     }
 }

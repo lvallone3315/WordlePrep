@@ -55,6 +55,17 @@ class GuessEvaluationTest {
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         expEvalResult = new GuessEvaluation.Result[] {GRAY, YELLOW, GREEN, GREEN, YELLOW};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
+
+        guess = "ROVER";            secretWord = "VIGOR";
+        System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
+        expEvalResult = new GuessEvaluation.Result[] {GRAY, YELLOW, YELLOW, GRAY, GREEN};
+        assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
+
+        // Note - evaluation is left to right, so the first instance is yellow, second is gray
+        guess = "CHEER";            secretWord = "CLOSE";
+        System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
+        expEvalResult = new GuessEvaluation.Result[] {GREEN, GRAY, YELLOW, GRAY, GRAY};
+        assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
     }
 
     @Test
