@@ -26,37 +26,35 @@ class GuessEvaluationTest {
      */
     @Test
     void evaluateGuess() {
-        String secretWord = "BRICK";        String guess = "CRICK";
+        String guess = "CRICK";      String secretWord = "BRICK";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         GuessEvaluation.Result[] expEvalResult = {GRAY, GREEN, GREEN, GREEN, GREEN};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
 
-        secretWord = "SHADE";        guess = "BRICK";
+        guess = "BRICK";             secretWord = "SHADE";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         expEvalResult = new GuessEvaluation.Result[] {GRAY, GRAY, GRAY, GRAY, GRAY};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
 
-        secretWord = "HELLO";        guess = "HELLO";
+        guess = "HELLO";            secretWord = "HELLO";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         expEvalResult = new GuessEvaluation.Result[] {GREEN, GREEN, GREEN, GREEN, GREEN};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
 
-        secretWord = "AAAAA";        guess = "ABCBA";
+        guess = "ABCBA";            secretWord = "AAAAA";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         expEvalResult = new GuessEvaluation.Result[] {GREEN, GRAY, GRAY, GRAY, GREEN};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
 
-        secretWord = "ABBEY";        guess = "BABES";
+        guess = "BABES";            secretWord = "ABBEY";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
         expEvalResult = new GuessEvaluation.Result[] {YELLOW, YELLOW, GREEN, GREEN, GRAY};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
 
-        /* Bug identified by Gemini - ToDo create a bug ticket to fix
-        secretWord = "TABOO";        guess = "ROBOT";
+        guess = "ROBOT";            secretWord = "TABOO";
         System.out.println(String.format("evaluateGuess: secret word %s, guess is %s\n",  secretWord, guess));
-        expEvalResult = new GuessEvaluation.Result[] {YELLOW, GRAY, GREEN, GREEN, YELLOW};
+        expEvalResult = new GuessEvaluation.Result[] {GRAY, YELLOW, GREEN, GREEN, YELLOW};
         assertArrayEquals(expEvalResult, guessEval.evaluateGuess(guess, secretWord));
-        */
     }
 
     @Test
