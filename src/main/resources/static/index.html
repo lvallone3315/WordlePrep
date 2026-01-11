@@ -96,6 +96,7 @@
         <button type = "submit">Guess</button>
         <button type = "button" onclick="resetGame()">ResetGame</button>
     </form>
+<div id="guesses"></div>
 <div id="messages"></div>
 <div id="results"></div>
 </div>
@@ -107,6 +108,7 @@
         await fetch(`/api/wordle/reset`, { method: 'POST' });
         clearGameDisplay();
         setGameControls(true);
+        getGameStatus();   // displays version number and number of guesses available
     }
 
     async function getGameStatus() {
@@ -116,6 +118,11 @@
                 // Find the version element and update it with the value from gameStatus
             if (data.gameVersion) {
                 document.getElementById('app-version').innerText = "version: " + data.gameVersion;
+            }
+            // Display the current remaining guesses on load ---
+            if (data.maxGuesses) {
+                const remaining = data.maxGuesses - data.numGuesses;
+                displayRemainingGuesses(remaining);
             }
         } catch (err) {
             document.getElementById('app-version').innerText = "version: offline";
@@ -128,20 +135,23 @@
 
         const response = await fetch(`/api/wordle/guess?guess=${guess}`, { method: 'POST' });
         const data = await response.json();
+        console.log("JSON keys returned: ", data.guessResult);
         clearMessages();           // clear prior message
 
         // Display guess result
         const resultsDiv = document.getElementById("results");
-        const guessEval = data.guessResult.guessEval || [];
-        const row = guessEval.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
+        const evaluation = data.guessResult.evaluation || [];
+        const row = evaluation.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
         const div = document.createElement('div');
         div.className = "result";
         div.innerHTML = row;
         resultsDiv.appendChild(div);
         clearGuessInput();   // clear the button contents & refocus for next input
 
+
         // Display game status messages
         const messagesDiv = document.getElementById("messages");
+        let remainingGuesses = data.gameStatus.maxGuesses - data.gameStatus.numGuesses;
         // if the guess is invalid, inform the user as to the reason the guess is invalid
         if (data.guessResult.guessStatus == "INVALID") {
             if (data.guessResult.guessReason == "GAME_OVER")
@@ -156,10 +166,16 @@
         } else if (data.gameStatus.userWon) {
             messagesDiv.innerHTML = "<strong>Congratulations! You guessed the word!</strong>";
             setGameControls(false);
+        // game over, but user hasn't won, number remaining guesses = 0
         } else if (data.gameStatus.gameOver) {
             messagesDiv.innerHTML = `<strong>Game Over! The word was ${data.gameStatus.secretWord}</strong>`;
             setGameControls(false);
         }
+        // if user won, print num guesses used, if not, display remaining guesses
+        if (data.gameStatus.userWon)
+            displayGuessesUsed(data.gameStatus.numGuesses);
+        else
+            displayRemainingGuesses(remainingGuesses);
     }  // end sendGuess
 
     // a little permuted, object flag is disabled, but for clarity using true to mean enable game controls
@@ -168,11 +184,30 @@
         document.getElementById("guessInput").disabled = !enabled;
     }
 
+    // helper function to display the number of guesses remaining to the player
+    function displayRemainingGuesses(remainingGuesses) {
+        const guessDiv = document.getElementById("guesses");
+        if (!guessDiv) return;  //
+
+        // use singular or plural as needed, if only a single guess remaining - display in red if only one guess remains
+        const guessText = (remainingGuesses === 1) ? "guess" : "guesses";
+        const textColor = (remainingGuesses === 1) ? "color: red;": "";
+        guessDiv.innerHTML = `<strong style = "${textColor}">You have ${remainingGuesses} ${guessText} remaining</strong>`;
+    }
+    // helper function to display the number of guesses the player used to solve the puzzle
+    function displayGuessesUsed(guessesUsed) {
+        const guessDiv = document.getElementById("guesses");
+        if (!guessDiv) return;
+        const guessText = (guessesUsed === 1) ? "guess" : "guesses";
+        guessDiv.innerHTML = `<strong style = "color:green">You used ${guessesUsed} ${guessText} to solve the puzzle</strong>`;
+    }
+
     // clear entire display, or individual helper functions to clear a display element
     function clearGameDisplay() {
         clearGuessInput();
         clearMessages();
         clearResults();
+        clearGuesses();
     }
 
     function clearGuessInput() {
@@ -188,11 +223,12 @@
     function clearResults() {
         document.getElementById("results").innerHTML = "";
     }
-</script>
-<script>
+    function clearGuesses() {
+        document.getElementById("guesses").innerHTML = "";
+    }
+
     window.onload = async () => {
         await resetGame();
-        await getGameStatus();
     };
 </script>
 
