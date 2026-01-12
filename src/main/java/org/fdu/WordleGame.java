@@ -16,7 +16,7 @@ import org.fdu.GameDTOs.*;
  * </p>
  *
  * @author Lee V
- * @version 1.0
+ * @version 1.0.1  Refactoring towards stateless
  */
 
 public class WordleGame {
@@ -69,18 +69,6 @@ public class WordleGame {
     }
 
     /**
-     * these methods are for testing,
-     * @return secret word
-     */
-    public String getSecretWord() {
-        return secretWord;
-    }
-    public boolean isGameOver() {
-        return gameOver;
-    } /** @return true if game is over */
-    public boolean didUserWin() { return userWon; }  /** @return true if the user won */
-
-    /**
      *   check if guess is valid,
      *   normalize the guess, all caps and trimmed whitespace
      *   evaluate the guess and return the color codes (enums) for each character in the results[]
@@ -89,40 +77,14 @@ public class WordleGame {
      * @return GuessResult - data class with: VALID/INVALID guess, color coded result enums
      */
     public GuessResult processGuess(String userGuess) {
-        // ToDo: add check here for game over - e.g. add another GuessStatus enum = GameOver
-        if (gameOver) {
-            return new GuessResult(GuessStatus.INVALID, null,
-                    GuessValidation.ValidationReason.GAME_OVER);
-        }
-        //  normalize the word (e.g. caps, no whitespace) & validate if meets requirements
-        String normalizedUserGuess = GuessValidation.normalizeWord(userGuess);
-        var validation = GuessValidation.validateWord(normalizedUserGuess);
-
-        // System.out.println("Secret Word: " + secretWord + "User Guess: " + userGuess);
-        if (!validation.isValid()) {
-            return new GuessResult(GuessStatus.INVALID, null,
-                    validation.reason());
-        }
-        //   user guess is valid
-        //     update guess counter, check guess to secret word
-        numGuessesTaken++;
-        GuessEvaluation.Result[] results = guessEval.evaluateGuess(normalizedUserGuess, secretWord);
-
-        // 4 scenarios - game isn't over - no message
-        //   game over & user won - userWon & gameOver = true, message WINNER
-        //   game over & user lost - gameOver = true, userWon = false, message LOSER
-        if (guessEval.isGuessCorrect(normalizedUserGuess, secretWord)) {
-            gameOver = true;
-            userWon = true;
-        }
-        else if (isUserOutOfGuesses()) {
-            gameOver = true;
-            userWon = false;  // unnecessary, but makes it clear
-        }  // else - game remains in progress
-
-        // return the results and game status for display
-        return new GuessResult(GuessStatus.VALID, results,
-                validation.reason() );
+        // refactor to use WordleService - create game state
+        // update local state based on return from WordleService processGuess
+        GameStatus game = new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES, gameVersion);
+        GuessResponse guessResponse = WordleService.processGuess(game, userGuess);
+        gameOver = guessResponse.gameStatus().gameOver();
+        userWon = guessResponse.gameStatus().userWon();
+        numGuessesTaken = guessResponse.gameStatus().numGuesses();
+        return guessResponse.guessResult();
     }
 
     /**
@@ -133,6 +95,7 @@ public class WordleGame {
     public GameStatus getGameStatus() {
         return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES, gameVersion);
     }
+
 
     /**
      * checks if player has used the maximum number of guesses
@@ -157,4 +120,16 @@ public class WordleGame {
     public int getNumGuessesTaken() {
         return numGuessesTaken;
     }
+
+    /**
+     * these methods are for testing,
+     * @return secret word
+     */
+    public String getSecretWord() {
+        return secretWord;
+    }
+    public boolean isGameOver() {
+        return gameOver;
+    } /** @return true if game is over */
+    public boolean didUserWin() { return userWon; }  /** @return true if the user won */
 }

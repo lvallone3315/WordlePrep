@@ -32,8 +32,27 @@ public class GameDTOs {
                              String secretWord,
                              int numGuesses,
                              int maxGuesses,
-                             String gameVersion) { }/**
+                             String gameVersion) {
 
+        /**
+         * "Wither" pattern for GameStatus.  Return a new instance with only the dynamic elements changed.
+         * @param isOver - updated value for gameOver
+         * @param won - updated value for userWon
+         * @param guesses - new number of guesses (typically previous +1)
+         * @return - updated GameStatus DTO with updates + original values
+         */
+        public GameStatus withGameUpdates(boolean isOver, boolean won, int guesses) {
+            return new GameStatus(
+                    isOver,    // updated
+                    won,       // updated
+                    this.secretWord,
+                    guesses,   // updated
+                    this.maxGuesses,
+                    this.gameVersion);
+        }
+    }
+
+     /**
      * DTO for processing the results of a user's guess
      * @param guessStatus - valid or invalid, see enum
      * @param evaluation - for valid guesses, indicates status of each letter (G Y Gray)
