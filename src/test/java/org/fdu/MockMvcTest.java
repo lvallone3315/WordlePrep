@@ -16,6 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 
+import tools.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 // JsonPath (Used for the "Cheat" logic)
 import com.jayway.jsonpath.JsonPath;
 
@@ -23,6 +27,7 @@ import com.jayway.jsonpath.JsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 
 import org.fdu.GameDTOs.*;
 
@@ -48,18 +53,22 @@ public class MockMvcTest {
 
     @Test
     public void testFullGameFlow() throws Exception {
-        // 1. Reset (Starts real game with a real random word)
-        MvcResult result = mockMvc.perform(post("/api/wordle/reset").session(session))
+        // 1. Reset - The server will send back the JSON AND a 'Set-Cookie' header
+        MvcResult result = mockMvc.perform(post("/api/wordle/reset")) // .session(session) is no longer needed
                 .andExpect(status().isCreated())
+                .andExpect(cookie().exists("wordle_state")) // Verify the cookie is actually there
                 .andReturn();
 
-        // 2. Extract the secret word from the response to "cheat" for the test
+        // Get the cookie from the response
+        jakarta.servlet.http.Cookie responseCookie = result.getResponse().getCookie("wordle_state");
+
+        // 2. Extract the secret word (the "cheat")
         String json = result.getResponse().getContentAsString();
         String secretWord = JsonPath.read(json, "$.secretWord");
 
-        // 3. Make a real guess using the real service logic
+        // 3. Make the guess - You MUST pass the cookie back to the server
         mockMvc.perform(post("/api/wordle/guess")
-                        .session(session)
+                        .cookie(responseCookie) // This "restores" the game state
                         .param("guess", secretWord))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.gameStatus.userWon").value(true))
