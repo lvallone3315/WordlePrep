@@ -128,6 +128,26 @@
             document.getElementById('app-version').innerText = "version: offline";
         }
     }
+    async function resetGameIfOver() {
+        try {
+            const response = await fetch(`/api/wordle/status`, { method: 'GET' });
+            const data = await response.json();
+            // Find the version element and update it with the value from gameStatus
+            if (data.gameVersion) {
+                document.getElementById('app-version').innerText = "version: " + data.gameVersion;
+            }
+            // Display the current remaining guesses on load ---
+            if (data.gameOver) {
+                resetGame();
+            }
+            else if (data.maxGuesses) {
+                const remaining = data.maxGuesses - data.numGuesses;
+                displayRemainingGuesses(remaining);
+            }
+        } catch (err) {
+            document.getElementById('app-version').innerText = "version: offline";
+        }
+    }
 
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
@@ -228,7 +248,7 @@
     }
 
     window.onload = async () => {
-        await resetGame();
+        await resetGameIfOver();
     };
 </script>
 
