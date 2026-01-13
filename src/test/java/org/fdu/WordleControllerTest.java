@@ -128,7 +128,7 @@ public class WordleControllerTest {
     // Another approach - set-up the game outside the http requests
     @Test
     public void testStatusReflectsInjectedState() throws Exception {
-        WordleGame game = new WordleGame("FLASK");
+        WordleGame game = new WordleGame();
         game.processGuess("APPLE");
         session.setAttribute("game", game);
         // now verify game is still in progress after one guess

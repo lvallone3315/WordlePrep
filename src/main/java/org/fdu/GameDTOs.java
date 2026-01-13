@@ -50,6 +50,16 @@ public class GameDTOs {
                     this.maxGuesses,
                     this.gameVersion);
         }
+        /**
+         * checks if player has used the maximum number of guesses
+         * @return true if player has used the maximum allowed guesses, false otherwise
+         */
+        public boolean isUserOutOfGuesses() {
+            return numGuesses >= maxGuesses;
+        }
+        public int getRemainingGuesses() {
+            return maxGuesses - numGuesses;
+        }
     }
 
      /**

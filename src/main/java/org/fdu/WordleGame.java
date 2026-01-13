@@ -22,7 +22,6 @@ import org.fdu.GameDTOs.*;
 public class WordleGame {
 
     private final WordleDictionary wordleDictionary = new WordleDictionary();
-    private final GuessEvaluation guessEval = new GuessEvaluation();
 
     private final static int MAX_GUESSES = 6;
 
@@ -43,33 +42,71 @@ public class WordleGame {
         secretWord = wordleDictionary.pickNewWord();
         storeGameVersion();
     }
+    /*
     public WordleGame(String secretWord) {
         this.secretWord = secretWord;
         storeGameVersion();
     }
+    */
+
+
+    public GameStatus createNewGame() {
+        return createNewGame(wordleDictionary.pickNewWord());
+    }
+    public GameStatus createNewGame(String secretWord) {
+        return new GameStatus(
+                false,  // gameOver
+                false,           // userWon
+                secretWord,      // secretWord, passed in (possibly created by dictionary version)
+                0,               // number of guesses taken
+                MAX_GUESSES,     // maximum number of guesses allowed
+                getGameVersion());  // derived version of the game
+    }
 
     /*
-     * helper function to retrieve the version information and store it
+     * helper function to retrieve the version information
      */
-    private void storeGameVersion() {
+    private String getGameVersion() {
+        String localGameVersion;
         // getResourceAsStream looks in src/main/resources (the classpath root)
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("version.properties")) {
             if (input != null) {
                 Properties prop = new Properties();
                 prop.load(input);
-                this.gameVersion = prop.getProperty("wordle.version", "unknown");
+                localGameVersion = prop.getProperty("wordle.version", "unknown");
             } else {
                 // This happens if the file is missing from the JAR
-                this.gameVersion = "unknown-v-file-missing";
+                localGameVersion = "unknown-v-file-missing";
             }
         } catch (Exception ex) {
             // Fallback if the file exists but is unreadable
-            this.gameVersion = "unknown-error";
+            localGameVersion = "unknown-error";
         }
+        return localGameVersion;
+    }
+
+    /* tempoary refactoring version - in favor of getGameVersion() */
+    private void storeGameVersion() {
+        this.gameVersion = getGameVersion();
+    }
+
+
+    /**
+     * Pass through version - state kept external to WordleGame and passed in <br>
+     * WordleService processGuess will: normalize the guess, all caps and trimmed whitespace <br>
+     *   evaluate the guess and return the color codes (enums) for each character in the results[] <br>
+     *   if user won - set the userWon flag <br>
+     *   if game over - set the gameOver flag  (userWon and gameOver retrieved from gameStatus) <br>
+     * @param game - current game status, new game status returned in the GuessResponse return
+     * @param userGuess - what the user entered
+     * @return package of gameStatus and guessStatus
+     */
+    public GuessResponse processGuess(GameStatus game, String userGuess) {
+        return WordleService.processGuess(game, userGuess);
     }
 
     /**
-     *   check if guess is valid,
+     *   legacy version - check if guess is valid,
      *   normalize the guess, all caps and trimmed whitespace
      *   evaluate the guess and return the color codes (enums) for each character in the results[]
      *   if user won - set the userWon flag
@@ -94,15 +131,6 @@ public class WordleGame {
      */
     public GameStatus getGameStatus() {
         return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES, gameVersion);
-    }
-
-
-    /**
-     * checks if player has used the maximum number of guesses
-     * @return true if player has used the maximum allowed guesses, false otherwise
-     */
-    public boolean isUserOutOfGuesses() {
-        return getNumGuessesTaken() >= MAX_GUESSES;
     }
 
     /**
