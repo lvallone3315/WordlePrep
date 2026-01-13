@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.fdu.GameDTOs.*;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -19,6 +20,7 @@ import org.fdu.GameDTOs.*;
  * @version 1.0.1  Refactoring towards stateless
  */
 
+@Component
 public class WordleGame {
 
     private final WordleDictionary wordleDictionary = new WordleDictionary();

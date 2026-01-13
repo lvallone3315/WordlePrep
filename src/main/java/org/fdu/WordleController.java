@@ -21,12 +21,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/wordle")
 public class WordleController {
+    private final WordleGame wordleGame;
+
+    // Spring injects the single instance here
+    public WordleController(WordleGame wordleGame) {
+        this.wordleGame = wordleGame;
+    }
 
     // helper function - get the currently running game, if none, create one
-    private WordleGame getGame(HttpSession session) {
-        WordleGame game = (WordleGame) session.getAttribute("game");
+    private GameStatus getGame(HttpSession session) {
+        GameStatus game = (GameStatus) session.getAttribute("game");
         if (game == null) {
-            game = new WordleGame();
+            game = wordleGame.createNewGame();
             session.setAttribute("game", game);
         }
         return game;
@@ -37,8 +43,8 @@ public class WordleController {
      * @param session
      */
     @PostMapping("/reset")
-    public ResponseEntity<WordleGame> reset(HttpSession session) {
-        WordleGame game = new WordleGame();
+    public ResponseEntity<GameStatus> reset(HttpSession session) {
+        GameStatus game = wordleGame.createNewGame();
         session.setAttribute("game", game);
         // Explicitly set the 201 Created status, default is 200 OK status
         return ResponseEntity.status(HttpStatus.CREATED).body(game);
@@ -52,9 +58,12 @@ public class WordleController {
      */
     @PostMapping("/guess")
     public GuessResponse guess(@RequestParam String guess, HttpSession session) {
-        WordleGame game = getGame(session);
-        GuessResult guessResult = game.processGuess(guess);
-        return new GuessResponse(guessResult, game.getGameStatus());
+        GameStatus game = getGame(session);
+        GuessResponse guessResponse = wordleGame.processGuess(game, guess);
+        GuessResult guessResult = guessResponse.guessResult();
+        game = guessResponse.gameStatus();
+        session.setAttribute("game", game);
+        return new GuessResponse(guessResult, game);
     }
 
     /**
@@ -64,10 +73,10 @@ public class WordleController {
      */
     @GetMapping("/status")
     public GameStatus getStatus(HttpSession session) {
-        WordleGame game = getGame(session);
+        GameStatus game = getGame(session);
         // test cases can get all information from WordleGame, but for now, allow access to GameStatus methods
-        session.setAttribute("gameStatus", game.getGameStatus());
-        return game.getGameStatus();
+        session.setAttribute("game", game);
+        return game;
     }
 
     /*
