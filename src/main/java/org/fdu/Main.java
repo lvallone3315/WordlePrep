@@ -36,6 +36,7 @@ public class Main {
          *   evaluate the results (GuessResult methods)
          */
         WordleGame game = new WordleGame();  // create a new instance of game w/o UI
+        GameStatus gameDTO =  game.createNewGame();   // stateless version of game, DTO contains state
         WordleUI ui = new WordleUI();
 
         GuessEvaluation.Result[] results;    // to pass into the UI
@@ -46,13 +47,13 @@ public class Main {
         // String secretWord = dictionary.pickNewWord();
 
         // debug help - ToDo: delete this
-        ui.writeMessage(game.getSecretWord() + "\n\n");
+        ui.writeMessage(gameDTO.secretWord() + "\n\n");
 
         /*
          *                     Main game loop
          *  Two phases
          *     processGuess() - returns data class GuessResult
-         *     getGameStatus() - returns if user won &/or if game is over
+         *     GameStatus() - DTO including if user won &/or if game is over, number of guesses, etc.
          *
          *       while user hasn't guessed the secret word or exhausted their guesses
          * getUserGuess from the UI & send to the game to evaluate
@@ -63,23 +64,27 @@ public class Main {
          */
         while (true) {  // as long as gameOver code works, no need to set a condition
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
-            GuessResult guessResult = game.processGuess(userGuess);
-            if (guessResult.guessStatus() == GuessStatus.INVALID) {
-                String message = getErrorMessage (guessResult.guessReason());
-                ui.writeMessage(message);
+            // WordleService returns both the new game status and the guess evaluation
+            GuessResponse response = WordleService.processGuess(gameDTO, userGuess);
+
+            // take care of invalid guesses - print appropriate error message
+            if (response.guessResult().guessStatus() == GuessStatus.INVALID) {
+                ui.writeMessage(getErrorMessage (response.guessResult().guessReason()));
                 continue;
             }
-            results = guessResult.evaluation();
-            ui.printGuessResult(userGuess, results);
+            gameDTO = response.gameStatus();       // updated game state
+
+            // valid guess - retrieve the evaluation and print to the console
+            ui.printGuessResult(userGuess, response.guessResult().evaluation());
 
             // now get the game status - captures if player won or if game over & player lost
-            GameStatus gameStatus = game.getGameStatus();
-            if (gameStatus.userWon()) {
+            // GameStatus gameStatus = game.getGameStatus();
+            if (gameDTO.userWon()) {
                 ui.writeMessage(WINNER);
                 break;   // user won the game,
             }
-            else if (gameStatus.gameOver()) {
-                ui.writeMessage(LOSER + gameStatus.secretWord());
+            else if (gameDTO.gameOver()) {
+                ui.writeMessage(LOSER + response.gameStatus().secretWord());
                 break;
             }
         }  // end game loop
