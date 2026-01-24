@@ -108,6 +108,8 @@ public class WordleGame {
     }
 
     /**
+     *   @deprecated - part of stateless refactore, replaced by overload takes gameStatus as input
+     *   Use {@link #processGuess(GameStatus, String)}
      *   legacy version - check if guess is valid,
      *   normalize the guess, all caps and trimmed whitespace
      *   evaluate the guess and return the color codes (enums) for each character in the results[]
@@ -115,6 +117,7 @@ public class WordleGame {
      *   if game over - set the gameOver flag  (userWon and gameOver retrieved from getGameStatus())
      * @return GuessResult - data class with: VALID/INVALID guess, color coded result enums
      */
+    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
     public GuessResult processGuess(String userGuess) {
         // refactor to use WordleService - create game state
         // update local state based on return from WordleService processGuess
@@ -136,30 +139,46 @@ public class WordleGame {
     }
 
     /**
+     * @deprecated - in favor of using status DTO to retrieve maximum number of guesses
      * Parameterize limit on user guesses
      * @return number of guesses user allowed before game is over
      */
+    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
     public int getMaxUserGuesses() {
         return MAX_GUESSES;
     }
 
     /**
+     * @deprecated - in favor of using status DTO to retrieve number of guesses used
      * For testing and future functionality, allow retrieval of # guesses taken
      * @return number of guesses taken
      */
+    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
     public int getNumGuessesTaken() {
         return numGuessesTaken;
     }
 
     /**
+     * @deprecated - in favor of using status DTO to retrieve secretWord, game Over & userwon info
      * these methods are for testing,
      * @return secret word
      */
+    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
     public String getSecretWord() {
         return secretWord;
     }
+    /**
+     * @deprecated - use status DTO to retrieve game Over
+     * @return true if game is over
+     */
+    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
     public boolean isGameOver() {
         return gameOver;
-    } /** @return true if game is over */
+    }
+    /**
+     * @deprecated - use status DTO to retrieve if user guessed the word
+     * @return true if the user won
+     */
+    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
     public boolean didUserWin() { return userWon; }  /** @return true if the user won */
 }
