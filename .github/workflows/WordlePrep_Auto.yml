@@ -7,7 +7,8 @@ permissions:
 
 on:
   push:
-    branches: ['**']
+    branches: ['**']    # run on every push on every branch
+  workflow_dispatch:    # manual button to kick-off the release pipeline
   # pull_request:
     # branches: ['**']
 
