@@ -159,7 +159,7 @@ public class WordleGame {
     }
 
     /**
-     * @deprecated - in favor of using status DTO to retrieve secretWord, game Over & userwon info
+     * @deprecated - in favor of using status DTO to retrieve secretWord, game Over and userwon info
      * these methods are for testing,
      * @return secret word
      */
