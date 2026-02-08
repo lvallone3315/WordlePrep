@@ -25,6 +25,9 @@ jobs:
         with:
             fetch-depth: 0  # fetch all history for all branches and tags
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5 # Adds metadata for the deployment
+
       - name: Set up JDK 25
         uses: actions/setup-java@v5.1.0
         with:
