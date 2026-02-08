@@ -55,5 +55,15 @@ jobs:
           name: package-artifact
           path: target/*.jar
 
+      # Generate JavaDoc and store as an artifact on the summary page (DevOps-57)
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc
+
+      - name: Upload Javadoc Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordle-javadocs
+          path: target/site/apidocs
+
 
 
