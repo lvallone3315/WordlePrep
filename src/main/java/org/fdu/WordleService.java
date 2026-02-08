@@ -18,7 +18,7 @@ public class WordleService {
      *   DTOs
      *   GuessResult - guess validity, colored evaluation[], reason for invalid guesses (e.g. INVALID_LENGTH) <br>
      *   GameStatus - updated gameOver, userWon and numGuesses fields, rest (e.g. maxGuesses) copied from original game status DTO <br>
-     * @return GuessResponse - data transfer object wrapping both GuessResult & GameStatus DTOs
+     * @return GuessResponse - data transfer object wrapping both GuessResult and GameStatus DTOs
      */
     public static GameDTOs.GuessResponse processGuess(GameStatus game, String userGuess) {
         // temporary - consider changing guessEval to static

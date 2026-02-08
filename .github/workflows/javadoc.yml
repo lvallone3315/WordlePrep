@@ -1,0 +1,58 @@
+name: Generate JavaDoc (latest version only, for any branch)
+
+# following generates JavaDoc for the application and saves to GitHub Pages
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+  # Ensure only one doc deployment runs at a time to prevent "race condition" overwrites
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+            fetch-depth: 0  # fetch all history for all branches and tags
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5 # Adds metadata for the deployment
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5.1.0
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/site/apidocs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Print Deployment URL
+        run: |
+          echo "Javadocs are live at: ${{ steps.deployment.outputs.page_url }}"
+
+      - name: Add URL to Job Summary
+        run: |
+          echo "### 🚀 Javadoc Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "The latest documentation is now live." >> $GITHUB_STEP_SUMMARY
+          echo "[View Javadocs](${{ steps.deployment.outputs.page_url }})" >> $GITHUB_STEP_SUMMARY

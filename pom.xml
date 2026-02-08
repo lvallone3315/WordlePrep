@@ -90,6 +90,16 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--  bring in javadoc generator for maven, see DevOps-57 for details -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
             <!-- Add this plugin configuration to build the fat JAR -->
             <!--
             <plugin>
