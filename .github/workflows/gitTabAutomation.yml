@@ -1,0 +1,48 @@
+name: Git tagging automation on merge to master
+
+on:
+  pull_request:   # when pull request is closed, trigger this workflow
+    types: [closed]
+    branches:
+      - master
+  push:
+    branches:
+      ['**']
+
+jobs:
+    create_tag:
+      runs-on: ubuntu-latest
+      # run only if the pull request is actually merged, e.g. don't run if PR closed, but not merged
+      if: github.event.pull_request.merged == true || github.event_name == 'push'
+
+      steps:
+        # step 1: checkout the code
+        - name: Checkout code
+          uses: actions/checkout@v6
+
+        # Step 2: Determine bump type (for push events, always 'patch'; for PRs, scan the description)
+        #    step will store the magnitude of the bump (e.g. major, minor, patch) ni environment var bump_type
+        - name: Determine bump type
+          id: bump_type
+          run: |
+            # For push events, always bump 'patch'
+            if [ "${{ github.event_name }}" == "push" ]; then
+              echo "bump_type=patch" >> $GITHUB_ENV
+            else
+              # For PRs, scan the PR description for #major or #minor
+              PR_DESCRIPTION="${{ github.event.pull_request.body }}"
+            
+              if [[ "$PR_DESCRIPTION" == *"#major"* ]]; then
+                echo "bump_type=major" >> $GITHUB_ENV
+              elif [[ "$PR_DESCRIPTION" == *"#minor"* ]]; then
+                echo "bump_type=minor" >> $GITHUB_ENV
+              else
+                echo "bump_type=patch" >> $GITHUB_ENV
+              fi
+            fi
+
+        # Step 3: Log the event type and bump type
+        - name: Log event and bump type
+          run: |
+            echo "Event Type: ${{ github.event_name }}"
+            echo "Bump Type: ${{ env.bump_type }}"
