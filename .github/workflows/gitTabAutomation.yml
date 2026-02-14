@@ -46,3 +46,21 @@ jobs:
           run: |
             echo "Event Type: ${{ github.event_name }}"
             echo "Bump Type: ${{ env.bump_type }}"
+
+        # Step 4: Bump version using anotherNick/github-tag-action (but do NOT apply the tag yet)
+        - name: Bump and preview new tag (without applying it)
+          uses: anotherNick/github-tag-action@v1.75.0
+          id: bump
+          with:
+            tag-prefix: 'v'  # Prefix for the tag (e.g., v1.0.0)
+            bump: ${{ env.bump_type }}
+            push: false  # Prevent the action from pushing the tag (just compute it)
+          # continue-on-error: true  # Prevents workflow from failing (we're just previewing here)
+
+        # Step 5: Log the computed new tag (without applying it)
+        - name: Log the computed new version tag (without applying it)
+          run: |
+            # Normally, the new tag would be in the output from the action
+            echo "Computed new version tag (without applying it): ${{ steps.bump.outputs.new_tag }}"
+        
+
