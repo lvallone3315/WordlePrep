@@ -16,18 +16,21 @@ jobs:
       if: github.event.pull_request.merged == true || github.event_name == 'push'
 
       steps:
-        # step 1: checkout the code
+        # step 1: checkout the code, full fetch (not shallow) to see all tags
         - name: Checkout code
           uses: actions/checkout@v6
           with:
             fetch-depth: 0
 
-        # Step 2: Determine bump type (for push events, always 'patch'; for PRs, scan the description)
-        #    step will store the magnitude of the bump (e.g. major, minor, patch) ni environment var bump_type
+        # Step 2: Determine bump type (for push events, if activated above, always 'patch'; for PRs, scan the description)
+        #    step will store the magnitude of the bump (e.g. major, minor, patch) in environment var bump_type
         - name: Determine bump type
           id: bump_type
           run: |
-            # For push events, always bump 'patch'
+            # Use a fallback for PR_DESCRIPTION to avoid null errors
+            PR_DESCRIPTION="${{ github.event.pull_request.body || '' }}"
+            
+            # For push events, always bump 'patch' (note: disabled by trigger, left here for debugging)
             if [ "${{ github.event_name }}" == "push" ]; then
               echo "bump_type=patch" >> $GITHUB_ENV
             else
@@ -49,21 +52,20 @@ jobs:
             echo "Event Type: ${{ github.event_name }}"
             echo "Bump Type: ${{ env.bump_type }}"
 
-        # Step 4: Bump version using anotherNick/github-tag-action (but do NOT apply the tag yet)
+        # Step 4: Bump version using anothrNick/github-tag-action
         - name: Bump and preview new tag (without applying it)
           uses: anothrNick/github-tag-action@1.75.0
           id: bump
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             WITH_V: true        # Tells it to look for and create 'v' tags
-            DRY_RUN: true       # This is the standard way to "preview" without pushing
+            DRY_RUN: false       # Set to true if want to preview without pushing the new tag
             DEFAULT_BUMP: ${{ env.bump_type }}
-          # continue-on-error: true  # Prevents workflow from failing (we're just previewing here)
 
-        # Step 5: Log the computed new tag (without applying it)
-        - name: Log the computed new version tag (without applying it)
+        # Step 5: Log the computed new tag
+        - name: Log the computed new version tag
           run: |
-            # Normally, the new tag would be in the output from the action
-            echo "Computed new version tag (without applying it): ${{ steps.bump.outputs.new_tag }}"
+            # The new tag should be in the output from the action
+            echo "Computed new version tag: ${{ steps.bump.outputs.new_tag }}"
         
 
