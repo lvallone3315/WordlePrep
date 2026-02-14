@@ -12,6 +12,8 @@ on:
 jobs:
     create_tag:
       runs-on: ubuntu-latest
+      permissions:
+        contents: write  # This allows the action to create and push tags
       # run only if the pull request is actually merged, e.g. don't run if PR closed, but not merged
       if: github.event.pull_request.merged == true || github.event_name == 'push'
 
