@@ -19,6 +19,8 @@ jobs:
         # step 1: checkout the code
         - name: Checkout code
           uses: actions/checkout@v6
+          with:
+            fetch-depth: 0
 
         # Step 2: Determine bump type (for push events, always 'patch'; for PRs, scan the description)
         #    step will store the magnitude of the bump (e.g. major, minor, patch) ni environment var bump_type
@@ -51,10 +53,11 @@ jobs:
         - name: Bump and preview new tag (without applying it)
           uses: anothrNick/github-tag-action@1.75.0
           id: bump
-          with:
-            tag-prefix: 'v'  # Prefix for the tag (e.g., v1.0.0)
-            bump: ${{ env.bump_type }}
-            push: false  # Prevent the action from pushing the tag (just compute it)
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            WITH_V: true        # Tells it to look for and create 'v' tags
+            DRY_RUN: true       # This is the standard way to "preview" without pushing
+            DEFAULT_BUMP: ${{ env.bump_type }}
           # continue-on-error: true  # Prevents workflow from failing (we're just previewing here)
 
         # Step 5: Log the computed new tag (without applying it)
