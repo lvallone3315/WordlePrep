@@ -1,13 +1,20 @@
 package org.fdu;
 
-import static org.fdu.GuessValidation.ValidationReason.*; // access to the GuessValidation reason code enum
 import org.fdu.GameDTOs.*;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+/**
+ * Main class - entry point and behavior for console-based Wordle game.  Not used for Web version.<br>
+ * <p>
+ * This class handles the orchestration of the game loop, manages console-specific <br>
+ * UI messages, and serves as the bridge between the {@link WordleService} <br>
+ * and the user's terminal. <br>
+ * <p>
+ * Note: This implementation is specific to the CLI version; <br>
+ * the Web version utilizes a separate entry point. <br>
+ */
 public class Main {
     private static final String WORDLE_INTRO = "\t\t\tWelcome to FDU Wordle\n";
-      // ToDo - update to screen size independent (not sure what this means yet)
+
     private static final String GAME_OVERVIEW = """
               
               A five (5) letter US English word will be selected\s
@@ -18,33 +25,44 @@ public class Main {
                   Gray   - letter is NOT in the word
               """;
     private static final String PROMPT_MESSAGE = "\nYour guess (5 letter word)? ";
+
     private static final String INVALID_ENTRY = "Invalid entry!!  Please re-enter your guess";   // used for unknowns
     private static final String GAME_ALREADY_OVER = "Game Over!! No more guesses";
     private static final String GUESS_LENGTH_INCORRECT = "Guess length is NOT 5 letters, Please re-enter";
     private static final String GUESS_NON_ALPHA = "Guess must contain only letters (a-z or A-Z), Please re-enter";
+
     private static final String WINNER = "\n\nCongratulations!  You are the Wordle Champ of the day";
     private static final String LOSER = "\n\nSorry!  You didn't guess the word, the word was: ";
 
+    // Main class constructor, not intended to be instantiated, primarily to quiet JavaDoc warning
+    private  Main() {}
 
+    /**
+     *  implements the primary game loop.  Not used for Web version.<br>
+     *  <p>
+     *  Three phases <br>
+     *  - initialize the session (ie game) and select secret word via {@link WordleGame} <br>
+     *  - read and validate user input (ie guess) via {@link WordleUI} <br>
+     *  - Process guesses via {@link WordleService}, update game state and inform user of results until game is over <br>
+     * <p>
+     * To transition to WebUI interface - 3 phases <br>
+     * - construct the game incl. picking the secret word (WordleGame constructor)<br>
+     * - get and process a guess (game.processGuess) <br>
+     * - valuate the results (GuessResult methods) <br>
+     *
+     * @param args None - not used at this time
+     */
     public static void main(String[] args) {
 
-        // AnsiConsole.systemInstall(); // to support colors on all terminal types
-        /**
-         * To transition to WebUI interface - 3 phases
-         *   construct the game incl. picking the secret word (WordleGame constructor)
-         *   get and process a guess (game.processGuess)
-         *   evaluate the results (GuessResult methods)
-         */
-        WordleGame game = new WordleGame();  // create a new instance of game w/o UI
-        GameStatus gameDTO =  game.createNewGame();   // stateless version of game, DTO contains state
-        WordleUI ui = new WordleUI();
+        // AnsiConsole.systemInstall(); // to support colors on all terminal types, doesn't work on Win 10
 
-        GuessEvaluation.Result[] results;    // to pass into the UI
+        WordleGame game = new WordleGame();  // create a new instance of game
+        GameStatus gameDTO =  game.createNewGame();   // stateless version, DTO contains game state, selects secret word
+        WordleUI ui = new WordleUI();
 
         // Display intro information
         ui.writeMessage(WORDLE_INTRO);
         ui.writeMessage(GAME_OVERVIEW);
-        // String secretWord = dictionary.pickNewWord();
 
         // debug help - ToDo: delete this
         ui.writeMessage(gameDTO.secretWord() + "\n\n");
@@ -55,12 +73,8 @@ public class Main {
          *     processGuess() - returns data class GuessResult
          *     GameStatus() - DTO including if user won &/or if game is over, number of guesses, etc.
          *
-         *       while user hasn't guessed the secret word or exhausted their guesses
-         * getUserGuess from the UI & send to the game to evaluate
-         *   if guess is NOT valid, print error message, and continue to next guess
-         *   if guess valid print the color coded results
-         *   if user won - print win message & exit game loop
-         *   else if user lost - print lose message & exit game loop
+         *  while user hasn't guessed the secret word or exhausted their guesses
+         *     getUserGuess from the UI & send to the game to evaluate
          */
         while (true) {  // as long as gameOver code works, no need to set a condition
             String userGuess = ui.getUserGuess(PROMPT_MESSAGE);
@@ -72,13 +86,14 @@ public class Main {
                 ui.writeMessage(getErrorMessage (response.guessResult().guessReason()));
                 continue;
             }
-            gameDTO = response.gameStatus();       // updated game state
 
-            // valid guess - retrieve the evaluation and print to the console
+            // valid guess, update game state, overwrite previous game state
+            gameDTO = response.gameStatus();
+
+            // retrieve the evaluation and print to the console
             ui.printGuessResult(userGuess, response.guessResult().evaluation());
 
-            // now get the game status - captures if player won or if game over & player lost
-            // GameStatus gameStatus = game.getGameStatus();
+            // handle game over scenarios - player won or if not, game over -> player lost
             if (gameDTO.userWon()) {
                 ui.writeMessage(WINNER);
                 break;   // user won the game,
@@ -88,19 +103,24 @@ public class Main {
                 break;
             }
         }  // end game loop
-    }  // end main method
+    }
 
+    /*
+     * helper method to map the reason code returned by processGuess to the actual user error message
+     * note: switch case labels MUST use unqualified name (e.g. NOT ValidationReason.GAME_OVER)
+     * default is a double-edge sword:
+     *   if we add another reason code, and forget to add it here, the game will still run
+     *   but, it will do so without error, so we miss an opportunity to find the issue.
+     * ToDo - remove "default", if additional enums are added, the switch statement will NOT compile.
+     */
     private static String getErrorMessage(GuessValidation.ValidationReason reasonCode) {
-        // J17+ adds an enhanced "switch expression", cutting away boiler plate
+        // J17+ adds an enhanced "switch expression", cutting away boilerplate
         // import of GuessValidation allows access to enums without the qualifiers
-        String message = switch (reasonCode) {
+        return switch (reasonCode) {
             case INVALID_LENGTH -> GUESS_LENGTH_INCORRECT;
             case GAME_OVER -> GAME_ALREADY_OVER;
             case NON_ALPHA -> GUESS_NON_ALPHA;
             default -> INVALID_ENTRY;
         };
-        return message;
     }
 }  // end main class
-
-
