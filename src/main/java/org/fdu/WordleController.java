@@ -8,6 +8,16 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import tools.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +32,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/wordle")
 public class WordleController {
     private final WordleGame wordleGame;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final String COOKIE_NAME = "wordle_state";
+    private static final int ONE_HOUR = 60 * 60;    // set cookie expiration to one hour
 
     // Spring injects the single instance here
     public WordleController(WordleGame wordleGame) {
@@ -29,6 +43,7 @@ public class WordleController {
     }
 
     // helper function - get the currently running game, if none, create one
+    // no longer used, but maybe we can refactor back to this?
     private GameStatus getGame(HttpSession session) {
         GameStatus game = (GameStatus) session.getAttribute("game");
         if (game == null) {
@@ -43,9 +58,9 @@ public class WordleController {
      * @param session
      */
     @PostMapping("/reset")
-    public ResponseEntity<GameStatus> reset(HttpSession session) {
+    public ResponseEntity<GameStatus> reset(HttpServletResponse response) throws Exception  {
         GameStatus game = wordleGame.createNewGame();
-        session.setAttribute("game", game);
+        setGameCookie(response, game);
         // Explicitly set the 201 Created status, default is 200 OK status
         return ResponseEntity.status(HttpStatus.CREATED).body(game);
     }
@@ -57,12 +72,18 @@ public class WordleController {
      * @return guessResponse including color coded letters and game status (e.g. over, winner)
      */
     @PostMapping("/guess")
-    public GuessResponse guess(@RequestParam String guess, HttpSession session) {
-        GameStatus game = getGame(session);
+    public GuessResponse guess(@RequestParam String guess,
+                               @CookieValue(name = COOKIE_NAME, defaultValue = "") String cookieValue,
+                               HttpServletResponse response) throws Exception {
+
+        // if the cookie is empty - start a new game, otherwise pick up where we left off
+        GameStatus game = cookieValue.isEmpty()? wordleGame.createNewGame() : deserializeGame(cookieValue);
+
         GuessResponse guessResponse = wordleGame.processGuess(game, guess);
+
         GuessResult guessResult = guessResponse.guessResult();
         game = guessResponse.gameStatus();
-        session.setAttribute("game", game);
+        setGameCookie(response, game);
         return new GuessResponse(guessResult, game);
     }
 
@@ -72,11 +93,39 @@ public class WordleController {
      * @return game state
      */
     @GetMapping("/status")
-    public GameStatus getStatus(HttpSession session) {
-        GameStatus game = getGame(session);
+    public GameStatus getStatus(@CookieValue(name = COOKIE_NAME, defaultValue = "") String cookieValue) {
+        GameStatus game = cookieValue.isEmpty()? wordleGame.createNewGame() : deserializeGame(cookieValue);
         // test cases can get all information from WordleGame, but for now, allow access to GameStatus methods
-        session.setAttribute("game", game);
         return game;
+    }
+
+
+    // Helper: Convert object to Base64 JSON string for the cookie
+    private String serializeGame(GameStatus game) throws Exception {
+        String json = objectMapper.writeValueAsString(game);
+        String base64 = Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        return URLEncoder.encode(base64, StandardCharsets.UTF_8);
+    }
+
+    // Helper: Convert Base64 JSON string back to object
+    private GameStatus deserializeGame(String cookieValue) {
+        try {
+            String decodedBase64 = URLDecoder.decode(cookieValue, StandardCharsets.UTF_8);
+            byte[] decodedBytes = Base64.getDecoder().decode(decodedBase64);
+            return objectMapper.readValue(decodedBytes, GameStatus.class);
+        } catch (Exception e) {
+            // can we use our helper function here instead?
+            return wordleGame.createNewGame();// Fallback if cookie is tampered with or old
+        }
+    }
+
+    // Helper: Utility to attach the cookie to the response
+    private void setGameCookie(HttpServletResponse response, GameStatus game) throws Exception {
+        Cookie cookie = new Cookie(COOKIE_NAME, serializeGame(game));
+        cookie.setPath("/");
+        cookie.setHttpOnly(true); // Security: prevents JS from stealing the cookie
+        cookie.setMaxAge(ONE_HOUR);
+        response.addCookie(cookie);
     }
 
     /*
