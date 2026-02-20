@@ -17,8 +17,10 @@
 
     <properties>
         <!-- explicitly overide parent's default - Jenkins build failing -->
+        <!--   logback 1.5.25 - fixes security vulnerability, low risk but as a learning tool ... -->
         <revision>1.0.0-SNAPSHOT</revision>
         <java.version>21</java.version>
+        <logback.version>1.5.25</logback.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -96,7 +98,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
-                    <show>private</show>
+                    <show>package</show>
                     <nohelp>true</nohelp>
                 </configuration>
             </plugin>

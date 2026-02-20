@@ -6,57 +6,71 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Configures and populates the dictionary of valid Wordle solutions. <br>
- * Includes methods to get a new word and return the last word selected
- *
+ * Configures and populates the dictionary of valid Wordle solution words. <br>
  * <p>
  * Constructor populates dictionary from an included csv. <br>
- * If the program can't open the csv (or is empty or zero valid words), <br>
- *   it uses a very small dictionary of preSelected words. <br>
- * Two additional methods are provided: <br>
+ * If the program can't open the csv (or the csv is empty or has zero valid words), <br>
+ *   it defaults to a very small dictionary of preSelected words to ensure game integrity. <br>
+ * One public method provided: <br>
  * - randomly select and return a new word from the dictionary <br>
- * - return the last word selected
  * </p>
- * Two test methods provided:<br>
+ * Three test methods provided:<br>
  * - constructor(dictionary name) - to allow testing of invalid dictionaries <br>
  * - getDictionarySize() - to check if using full dictionary or small version <br>
+ * - return the last word selected
  *
  * @author Lee V
- * @version v1.0 (first version with a full dictionary)
+ * @version v1.3.5 (1.0.0 was first version with a full dictionary)
  * @since 0.0.1
  */
 
 public class WordleDictionary {
-    private String currentWord;
-    private String[] smallWordSet = {"CRANE", "SHINE", "PLANT", "BRICK", "DRAFT"};
-    private final List<String> dictionary = new ArrayList<>();
     private static final String SOLUTIONS_DICTIONARY = "valid_solutions.csv";  // must be static for overloaded constructor
+
+    private static final String[] smallWordSet = {"CRANE", "SHINE", "PLANT", "BRICK", "DRAFT"};
+    private final List<String> dictionary = new ArrayList<>();
+
+    private final Random random = new Random();
+
+    private String currentWord;
+
 
 
     /**
-     * Read the dictionary file into the program,
-     *    if can't open the dictionary (or can't find it), use a few predefined words <br>
-     * Overloaded constructor so we can test invalid dictionaries
-     *
-     * <br> IO exception caught internally (ie not actually thrown)
+     * Constructs a dictionary using the default word set. <br>
+     * Default constructor, standard "entry" point. <br>
+     * if we can't open the dictionary (or can't find it), use a few predefined words <br>
+     * <p>
+     * <b>Implementation note: </b> Internally calls {@link #WordleDictionary(String)} with the standard dictionary.
+
      */
     public WordleDictionary() {
         this(SOLUTIONS_DICTIONARY);
     }
-    public WordleDictionary(String dictionaryName) {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(dictionaryName);
-             InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(isr)) {
 
+
+    /**
+     * Constructs a dictionary from a specified resource file (for testing purposes)<br>
+     * Overloaded constructor defined to enable testing of invalid dictionaries <br>
+     *
+     * @param dictionaryName csv resource to open
+     * <b>Implementation note: </b> if the dictionary cannot be loaded or is invalid,
+     * the dictionary falls back to {@code smallWordSet} and logs the stack trace. <br>
+     * IO exception caught internally (ie not actually thrown)
+     */
+    public WordleDictionary(String dictionaryName) {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(dictionaryName)) {
             if (is == null) {
-                throw new FileNotFoundException("Dictionary file not found");
+                throw new FileNotFoundException("Dictionary resource not found: " + dictionaryName);
             }
-            // string should be valid and trimmed - but just to be safe
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String cleanedWord = line.toUpperCase().trim();
-                if (GuessValidation.validateWord(cleanedWord).isValid()) {
-                    dictionary.add(cleanedWord);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                // string should be valid and trimmed - but just to be safe
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String cleanedWord = line.toUpperCase().trim();
+                    if (GuessValidation.validateWord(cleanedWord).isValid()) {
+                        dictionary.add(cleanedWord);
+                    }
                 }
             }
             // if dictionary is empty - throw exception & use preloaded version
@@ -72,32 +86,36 @@ public class WordleDictionary {
     }
 
     /**
-     *     randomly select a word from the dictionary, assume lower bound = 0, upper = dictionary size
+     *     randomly select and return a word from the dictionary<br>
+     *     @return randomly selected word or "" if dictionary is empty (ToDo: throw an exception)
+     *     <b>Implementation note: </b>  assume lower bound = 0, upper = dictionary size
      *        nextInt maximum = specified parameter ie [0,param]
-     * @return randomly selected word or "" if dictionary is empty (ToDo: throw an exception)
      */
     public String pickNewWord() {
         if (dictionary.isEmpty()) { return ""; }
 
-        Random random = new Random();
         this.currentWord = dictionary.get(random.nextInt(dictionary.size()));
         return this.currentWord;
     }
 
+    // The following methods are intended to support unit testing
+    //   intentionally package scope only (ie not public)
     /**
-     *     get the word selected from the last call to pickNewWord()
+     *     get the word selected from the last call to pickNewWord() <br>
+     *     or null if {@link #pickNewWord()} has not yet been called.
      * @return last word selected from dictionary
      */
 
-    public String getCurrentWord() {
+    String getCurrentWord() {
         return this.currentWord;
     }
 
     /**
-     * For testing - return the size of the dictionary
+     * For testing - return the size of the dictionary <br>
+     * useful to check if full or fallback dictionary loaded
      * @return number of words in the dictionary
      */
-    public int getDictionarySize() {
+    int getDictionarySize() {
         return dictionary.size();
     }
 }
