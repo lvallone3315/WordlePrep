@@ -53,7 +53,8 @@ public class WordleDictionary {
      * Constructs a dictionary from a specified resource file (for testing purposes)<br>
      * Overloaded constructor defined to enable testing of invalid dictionaries <br>
      *
-     * @param dictionaryName csv resource to open
+     * @param dictionaryName csv resource to open <br>
+     *
      * <b>Implementation note: </b> if the dictionary cannot be loaded or is invalid,
      * the dictionary falls back to {@code smallWordSet} and logs the stack trace. <br>
      * IO exception caught internally (ie not actually thrown)
@@ -87,8 +88,10 @@ public class WordleDictionary {
 
     /**
      *     randomly select and return a word from the dictionary<br>
-     *     @return randomly selected word or "" if dictionary is empty (ToDo: throw an exception)
-     *     <b>Implementation note: </b>  assume lower bound = 0, upper = dictionary size
+     *     @return randomly selected word or "" if dictionary is empty<br>
+     *     (ToDo: throw an exception if dictionary is empty) <br>
+     *
+     *     <b>Implementation note: </b>  assume lower bound = 0, upper = dictionary size <br>
      *        nextInt maximum = specified parameter ie [0,param]
      */
     public String pickNewWord() {
@@ -101,7 +104,7 @@ public class WordleDictionary {
     // The following methods are intended to support unit testing
     //   intentionally package scope only (ie not public)
     /**
-     *     get the word selected from the last call to pickNewWord() <br>
+     * For testing - get the word selected from the last call to pickNewWord() <br>
      *     or null if {@link #pickNewWord()} has not yet been called.
      * @return last word selected from dictionary
      */
