@@ -46,14 +46,12 @@ public class WordleService {
         //   user guess is valid
         //     update guess counter, check guess to secret word
         int newNumGuesses = game.numGuesses() + 1;
-            // temporary - ToDo: change guessEval to static
-        GuessEvaluation guessEval = new GuessEvaluation();
-        GuessEvaluation.Result[] results = guessEval.evaluateGuess(normalizedUserGuess, game.secretWord());
+        GuessEvaluation.Result[] results = GuessEvaluation.evaluateGuess(normalizedUserGuess, game.secretWord());
 
         // 4 scenarios - game isn't over - no message
         //   game over & user won - userWon & gameOver = true, message WINNER
         //   game over & user lost - gameOver = true, userWon = false, message LOSER
-        if (guessEval.isGuessCorrect(normalizedUserGuess, game.secretWord())) {
+        if (GuessEvaluation.isGuessCorrect(normalizedUserGuess, game.secretWord())) {
             gameOver = true;
             userWon = true;
         }
