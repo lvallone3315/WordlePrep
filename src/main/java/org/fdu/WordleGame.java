@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
  * <p>
  *     <b>Scope: <br> </b>
  *     - constructor - empty <br>
- *     - game creation via - {@link #createNewGame()} returns DTO with default game <br>
+ *     - game creation via - {@link #createNewGame()} returns DTO with default game including a secret word<br>
  *     - guess evaluation via {@link WordleService}, packages results into guess evaluation and game status DTOs <br>
- *     - Versioning via retrieval of version.properties in resources
- * </p>
+ *     - Versioning via retrieval of version.properties in resources <br>
+ *     - Defines maximum # of allowed guesses
  *
  * @author Lee V
- * @version 1.1  Stateless, ToDo - get rid of constructor
+ * @version 1.1  Stateless
  */
 
 @Component
@@ -29,15 +29,17 @@ public class WordleGame {
     private final WordleDictionary wordleDictionary = new WordleDictionary();
 
     private final static int MAX_GUESSES = 6;
+    private final String gameVersion;
 
     /**
-     *   WordleGame() - empty constructor, actual game created with {@link #createNewGame()}
+     *   WordleGame() - actual game created with {@link #createNewGame()}, derives and stores game version
      */
-    public WordleGame() {
+    public WordleGame( ) {
+        gameVersion = getGameVersion();
     }
 
     /**
-     *   selects word from standard dictionary <br>
+     *   creates a game with the initial game state including new word from standard dictionary <br>
      *   after selecting word {@link WordleDictionary#pickNewWord()} calls {@link #createNewGame(String)}
      * @return DTO for initial game (e.g. gameOver: false, number guesses taken = 0 ...)
      */
@@ -57,7 +59,7 @@ public class WordleGame {
                 secretWord,      // secretWord, passed in (possibly created by dictionary version)
                 0,               // number of guesses taken
                 MAX_GUESSES,     // maximum number of guesses allowed
-                getGameVersion());  // derived version of the game
+                this.gameVersion);    // derived version of the game
     }
 
     /*
