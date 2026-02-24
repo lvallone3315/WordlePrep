@@ -8,16 +8,19 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * Create and control a single game of Wordle.  Processes user guess(es); return results and game status.
+ * Create and control Wordle games - stateless.  Includes DTO creation, game version definition and
+ * guess evaluation through {@link WordleService}
  *
  * <p>
- * Constructs a new game of Wordle.  Scope includes: processing the player's guess, tracking number of guesses
- *   made and the maximum allowed.  Tracks state such as did the player win, is the game over.<br>
- *   Provide access to the current status of the game (gameStatus).
+ *     <b>Scope: <br> </b>
+ *     - constructor - empty <br>
+ *     - game creation via - {@link #createNewGame()} returns DTO with default game <br>
+ *     - guess evaluation via {@link WordleService}, packages results into guess evaluation and game status DTOs <br>
+ *     - Versioning via retrieval of version.properties in resources
  * </p>
  *
  * @author Lee V
- * @version 1.0.1  Refactoring towards stateless
+ * @version 1.1  Stateless, ToDo - get rid of constructor
  */
 
 @Component
@@ -27,34 +30,26 @@ public class WordleGame {
 
     private final static int MAX_GUESSES = 6;
 
-    // game state variables
-    private String secretWord;
-    private int numGuessesTaken = 0;
-    private boolean gameOver = false;
-    private boolean userWon = false;
-    private String gameVersion = "unknown";
-
-
     /**
-     * Two constructors
-     *   WordleGame() - selects a word from the dictionary (standard game play constructor)
-     *   WordleGame(String) - sets the secret word to the selected string (for testing)
+     *   WordleGame() - empty constructor, actual game created with {@link #createNewGame()}
      */
     public WordleGame() {
-        secretWord = wordleDictionary.pickNewWord();
-        storeGameVersion();
     }
-    /*
-    public WordleGame(String secretWord) {
-        this.secretWord = secretWord;
-        storeGameVersion();
-    }
-    */
 
-
+    /**
+     *   selects word from standard dictionary <br>
+     *   after selecting word {@link WordleDictionary#pickNewWord()} calls {@link #createNewGame(String)}
+     * @return DTO for initial game (e.g. gameOver: false, number guesses taken = 0 ...)
+     */
     public GameStatus createNewGame() {
         return createNewGame(wordleDictionary.pickNewWord());
     }
+
+    /**
+     *   WordleGame(String) - sets the secret word to the selected string (for testing)
+     * @param secretWord string to compare users guesses to
+     * @return DTO for initial game (e.g. gameOver: false, number guesses taken = 0 ...)
+     */
     public GameStatus createNewGame(String secretWord) {
         return new GameStatus(
                 false,  // gameOver
@@ -66,7 +61,7 @@ public class WordleGame {
     }
 
     /*
-     * helper function to retrieve the version information
+     * helper function to retrieve the game version information
      */
     private String getGameVersion() {
         String localGameVersion;
@@ -87,11 +82,6 @@ public class WordleGame {
         return localGameVersion;
     }
 
-    /* tempoary refactoring version - in favor of getGameVersion() */
-    private void storeGameVersion() {
-        this.gameVersion = getGameVersion();
-    }
-
 
     /**
      * Pass through version - state kept external to WordleGame and passed in <br>
@@ -106,79 +96,4 @@ public class WordleGame {
     public GuessResponse processGuess(GameStatus game, String userGuess) {
         return WordleService.processGuess(game, userGuess);
     }
-
-    /**
-     *   @deprecated - part of stateless refactore, replaced by overload takes gameStatus as input
-     *   Use {@link #processGuess(GameStatus, String)}
-     *   legacy version - check if guess is valid,
-     *   normalize the guess, all caps and trimmed whitespace
-     *   evaluate the guess and return the color codes (enums) for each character in the results[]
-     *   if user won - set the userWon flag
-     *   if game over - set the gameOver flag  (userWon and gameOver retrieved from getGameStatus())
-     * @return GuessResult - data class with: VALID/INVALID guess, color coded result enums
-     */
-    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
-    public GuessResult processGuess(String userGuess) {
-        // refactor to use WordleService - create game state
-        // update local state based on return from WordleService processGuess
-        GameStatus game = new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES, gameVersion);
-        GuessResponse guessResponse = WordleService.processGuess(game, userGuess);
-        gameOver = guessResponse.gameStatus().gameOver();
-        userWon = guessResponse.gameStatus().userWon();
-        numGuessesTaken = guessResponse.gameStatus().numGuesses();
-        return guessResponse.guessResult();
-    }
-
-    /**
-     * Status is calculated when processing the user's guess
-     * @return GameStatus - is game over (true/false), has user won (true/false), secret word for display
-     *   and a message to display to the user
-     */
-    public GameStatus getGameStatus() {
-        return new GameStatus(gameOver, userWon, secretWord, numGuessesTaken, MAX_GUESSES, gameVersion);
-    }
-
-    /**
-     * @deprecated - in favor of using status DTO to retrieve maximum number of guesses
-     * Parameterize limit on user guesses
-     * @return number of guesses user allowed before game is over
-     */
-    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
-    public int getMaxUserGuesses() {
-        return MAX_GUESSES;
-    }
-
-    /**
-     * @deprecated - in favor of using status DTO to retrieve number of guesses used
-     * For testing and future functionality, allow retrieval of # guesses taken
-     * @return number of guesses taken
-     */
-    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
-    public int getNumGuessesTaken() {
-        return numGuessesTaken;
-    }
-
-    /**
-     * @deprecated - in favor of using status DTO to retrieve secretWord, game Over and userwon info
-     * these methods are for testing,
-     * @return secret word
-     */
-    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
-    public String getSecretWord() {
-        return secretWord;
-    }
-    /**
-     * @deprecated - use status DTO to retrieve game Over
-     * @return true if game is over
-     */
-    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
-    public boolean isGameOver() {
-        return gameOver;
-    }
-    /**
-     * @deprecated - use status DTO to retrieve if user guessed the word
-     * @return true if the user won
-     */
-    @Deprecated(since = "24-Jan, 2026, stateless refactor", forRemoval = true)
-    public boolean didUserWin() { return userWon; }  /** @return true if the user won */
 }
