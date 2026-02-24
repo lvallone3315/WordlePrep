@@ -25,10 +25,12 @@ public class GuessEvaluation {
      * Enum defining the valid colors for guess evaluation
      */
     public enum Result  {
-        GREEN,      /** letter in secret word and in same position */
-        YELLOW,     /** letter in secret word, in a different position */
-        GRAY}       /** letter not in secret word */
-
+        /** letter in secret word and in same position */
+        GREEN,
+        /** letter in secret word, in a different position */
+        YELLOW,
+        /** letter not in secret word */
+        GRAY }
 
     /**
      * Evaluate the users guess and returns the results, does <b>NOT</b> update the game state<br>
