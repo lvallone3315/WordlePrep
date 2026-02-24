@@ -1,27 +1,40 @@
 package org.fdu;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeAll.*;
 
 import org.fdu.GameDTOs.*;
 
 
 class WordleGameTest {
-/*
-    @Test
-    void initialGameStatus() {
-        WordleGame game = new WordleGame("APPLE");
-        GameStatus status = game.getGameStatus();
 
-        assertFalse(status.gameOver());
-        assertFalse(status.userWon());
-        assertEquals(0, status.numGuesses());
-        assertEquals(game.getMaxUserGuesses(), status.maxGuesses());
+    static WordleGame game;
+
+    @BeforeAll
+    static void setup () {
+        game = new WordleGame();
     }
 
+    @DisplayName ("Create the WordleGame singleton object including generating version #" )
+    @Test
+    void initialGameStatus() {
+        GameStatus gameStatus = game.createNewGame();
+
+        assertFalse(gameStatus.gameOver(), "Initial game state showing game is Over");
+        assertFalse(gameStatus.userWon(), "Initial game state showing user already won");
+        assertEquals(0, gameStatus.numGuesses(), "Initial game state number remaining guesses not zero");
+        assertEquals(6, gameStatus.maxGuesses(), "Initial game state, max user guesses != 6");
+        System.out.println("Version #: " + gameStatus.gameVersion());
+        // local versions include snapshot - test for that
+        assertTrue(gameStatus.gameVersion().contains("SNAPSHOT"), "SNAPSHOT not in local game version #");
+    }
+
+
+
+    /*
     @Test
     // verifies there is a valid game version (doesn't include "unknown")
     void getGameVersion() {
