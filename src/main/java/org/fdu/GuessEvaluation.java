@@ -24,7 +24,10 @@ public class GuessEvaluation {
     /**
      * Enum defining the valid colors for guess evaluation
      */
-    public enum Result  {GREEN, YELLOW, GRAY}
+    public enum Result  {
+        GREEN,      /** letter in secret word and in same position */
+        YELLOW,     /** letter in secret word, in a different position */
+        GRAY}       /** letter not in secret word */
 
 
     /**
