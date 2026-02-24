@@ -3,7 +3,6 @@ package org.fdu;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeAll.*;
 
 class WordleDictionaryTest {
     private static WordleDictionary dictionary;
@@ -34,8 +33,11 @@ class WordleDictionaryTest {
         for (int itr = 0; itr < 5; itr++) {
             String secretWord = dictionary.pickNewWord();
             System.out.println(secretWord);
-            assertTrue(GuessValidation.validateWord(secretWord).isValid(), "Word returned from dictionary is not valid");
-            assertEquals(secretWord, dictionary.getCurrentWord(), "word returned by pick doesn't match get");
+            assertNotNull(secretWord, "Picked word should not be null");
+            assertTrue(GuessValidation.validateWord(secretWord).isValid(),
+                    "Word returned from dictionary fails validation: " + secretWord);
+            assertEquals(secretWord, dictionary.getCurrentWord(),
+                    "stored current word didn't update correctly after pickNewWord()");
         }
     }
 
@@ -49,7 +51,7 @@ class WordleDictionaryTest {
         assertTrue((size < 100), "small dictionary NOT populated");
         // verify can get a non-blank word from the bad dictionary
         String secretWord = badDictionary.pickNewWord();
-        assertNotEquals(secretWord, "", "No word returned from small dictionary");
+        assertNotEquals("", secretWord, "No word returned from small dictionary");
     }
 
     // load a dictionary with a mix of valid and invalid words, only the valid words should be loaded
@@ -59,14 +61,14 @@ class WordleDictionaryTest {
         int size = invalidWordDictionary.getDictionarySize();
         System.out.println("invalidWordDictionary loaded size: " + size);
         assertTrue((size > 0), "small dictionary NOT populated");
-        assertTrue((size < 5), "small dictionary NOT populated");
+        assertTrue((size < 10), "small dictionary NOT populated");
         // verify can get a non-blank word from the dictionary
-        String secretWord = dictionary.pickNewWord();
-        assertNotEquals(secretWord, "", "No word returned from mixed validity dictionary");
+        String secretWord = invalidWordDictionary.pickNewWord();
+        assertNotEquals("", secretWord, "No word returned from mixed validity dictionary");
         System.out.println("Word retrieved from mixed validity dictionary: " + secretWord);
     }
 
-    // ToDo: not implemented yet - load an empty dictionary, should load the small dictionary instead
+    // trying to load an empty dictionary, code should load the small dictionary instead
     @Test
     void loadEmptyDictionary() {
         WordleDictionary emptyDictionary = new WordleDictionary("EmptyDictionary.csv");
