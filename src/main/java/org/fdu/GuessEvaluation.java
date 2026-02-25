@@ -11,6 +11,9 @@ import java.util.List;
  * class assumes the users guess are validated prior to calling here <br>
  *   In current implementation: if the userGuess is invalid (e.g. >5 chars), an all GRAY result is returned <br>
  *   ToDo - throw exception if the userGuess and/or secretWord are not valid
+ *
+ *  @author Lee V
+ *  @version v1.0.0
  */
 
 public class GuessEvaluation {

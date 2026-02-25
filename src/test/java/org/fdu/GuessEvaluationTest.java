@@ -13,9 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.fdu.GuessEvaluation.Result.*;  // color enums
 import static org.fdu.GuessEvaluation.evaluateGuess;
 
-/**
- *
- */
+
 class GuessEvaluationTest {
 
     /*

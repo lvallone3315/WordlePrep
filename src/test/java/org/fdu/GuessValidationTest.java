@@ -1,7 +1,6 @@
 package org.fdu;
 
 import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.fdu.GuessValidation.ValidationReason.*;
@@ -94,29 +93,31 @@ class GuessValidationTest {
         System.out.print(numeric + " "); System.out.println(nonAlpha);
 
         assertFalse(GuessValidation.validateWord(sixChars).isValid(), "six char guess, should be invalid");
-        assertEquals(GuessValidation.validateWord(sixChars).reason(), INVALID_LENGTH);
+        assertEquals( INVALID_LENGTH, GuessValidation.validateWord(sixChars).reason());
         assertTrue(GuessValidation.validateWord(fiveMixedCaseV).isValid(), "mixed case, 5 letters, should be valid");
-        assertEquals(GuessValidation.validateWord(fiveMixedCaseV).reason(), VALID);
+        assertEquals(VALID, GuessValidation.validateWord(fiveMixedCaseV).reason());
         assertFalse(GuessValidation.validateWord(fourChars).isValid(), "four chars, should be invalid");
-        assertEquals(GuessValidation.validateWord(fourChars).reason(), INVALID_LENGTH);
+        assertEquals(INVALID_LENGTH, GuessValidation.validateWord(fourChars).reason());
         assertFalse(GuessValidation.validateWord(numeric).isValid(), "numeric, should be invalid");
-        assertEquals(GuessValidation.validateWord(numeric).reason(), NON_ALPHA);
+        assertEquals(NON_ALPHA, GuessValidation.validateWord(numeric).reason());
         assertTrue(GuessValidation.validateWord(allUpperV).isValid(), "upper case, 5 letters, should be valid");
         assertFalse(GuessValidation.validateWord(nonAlpha).isValid(), "non-alphabetic chars, should be invalid");
-        assertEquals(GuessValidation.validateWord(nonAlpha).reason(), NON_ALPHA);
+        assertEquals(NON_ALPHA, GuessValidation.validateWord(nonAlpha).reason());
         //  all blanks returned as too short
         assertFalse(GuessValidation.validateWord(blank).isValid(), "blank, should be invalid");
-        assertEquals(GuessValidation.validateWord(blank).reason(), INVALID_LENGTH);
+        assertEquals(INVALID_LENGTH, GuessValidation.validateWord(blank).reason());
         assertTrue(GuessValidation.validateWord(allLowerV).isValid(), "lower case, 5 letters, should be valid");
         assertTrue(GuessValidation.validateWord(leadingWhiteV).isValid(), "leading & trailing white space, 5 letters, should be valid");
         assertFalse(GuessValidation.validateWord(inBetweenWhite).isValid(), "white space in middle of chars, 5 letters, should be invalid");
-        assertEquals(GuessValidation.validateWord(inBetweenWhite).reason(), NON_ALPHA);
+        assertEquals(NON_ALPHA, GuessValidation.validateWord(inBetweenWhite).reason());
         // Testing a control character (ASCII 7 is "Bell")
         String bellChar = "ABC" + (char)7 + "E";
         assertFalse(GuessValidation.validateWord(bellChar).isValid(), "Control char should be invalid");
         assertEquals(NON_ALPHA, GuessValidation.validateWord(bellChar).reason());
     }
 
+    // the tests below appear to execute correctly, but code coverage not showing the methods (e.g. getReasonString)
+    //   as being executed
     @Test
     void getReasonStringTest() {
         System.out.println("*** Testing reason strings for ValidationReason enums, such as: invalid length: " + INVALID_LENGTH.getReasonString());
