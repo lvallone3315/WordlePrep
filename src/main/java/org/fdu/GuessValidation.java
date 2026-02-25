@@ -10,6 +10,9 @@ package org.fdu;
  * {@link #normalizeWord(String)} removes leading and trailing white space) and shifts all characters to UPPERCASE <p>
  * <p>
  * WORD_LENGTH - defines the length for guesses and secret words for the entire project (public, static)
+ *
+ * @author Lee V
+ * @version v1.0.0
  */
 public final class GuessValidation {
 
@@ -48,7 +51,6 @@ public final class GuessValidation {
      */
     public static ValidationResult validateWord(String userGuess) {
         String localUserGuess = userGuess.trim();   // trim leading and trailing white space
-        ValidationResult result;
 
         // check length - must be an exact match, ie too long is no good either
         if (localUserGuess.length() != WORD_LENGTH){
