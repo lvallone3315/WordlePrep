@@ -13,7 +13,11 @@ public class WordleUI {
     // if multiple instances created, all will use the same scanner
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    // UI instantiated for two reasons: Scanner is stateful and improves readability in calling code (e.g. ui.)
+    /**
+     * UI constructor - instantiated for two reasons:<br>
+     * Scanner is stateful and improves readability in calling code (e.g. ui.)
+     */
+
     public WordleUI() {} // empty constructor
 
     /**
