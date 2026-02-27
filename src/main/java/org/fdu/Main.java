@@ -102,11 +102,11 @@ public class Main {
 
             // handle game over scenarios - player won or if not, game over -> player lost
             if (gameDTO.userWon()) {
-                ui.writeMessage(WINNER);
+                ui.writeMessage(WINNER + "\n");
                 break;   // user won the game,
             }
             else if (gameDTO.gameOver()) {
-                ui.writeMessage(LOSER + response.gameStatus().secretWord());
+                ui.writeMessage(LOSER + response.gameStatus().secretWord() + "\n");
                 break;
             }
         }  // end game loop
