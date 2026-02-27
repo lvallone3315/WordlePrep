@@ -53,9 +53,16 @@ public class Main {
      * @param args None - not used at this time
      */
     public static void main(String[] args) {
+        playWordleConsole();
+    }
+
+    /**
+     * Wordle console version - callable from Spring Boot as well as main()
+     */
+
+    public static void playWordleConsole() {
 
         // AnsiConsole.systemInstall(); // to support colors on all terminal types, doesn't work on Win 10
-
         WordleGame game = new WordleGame();  // create a new instance of game
         GameStatus gameDTO =  game.createNewGame();   // stateless version, DTO contains game state, selects secret word
         WordleUI ui = new WordleUI();
