@@ -1,6 +1,5 @@
 package org.fdu;
 
-import org.fdu.WordleGame;
 import org.fdu.GameDTOs.*;
 import jakarta.servlet.http.HttpSession;
 
@@ -13,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST APIs to the Web UI interface (e.g. html and js)
- * RestController annotation - directs method return values to be converted to JSON/XML
- * RequestMapping - routes incoming http requests to specific controller methods
+ * REST APIs supporting the Web UI interface (e.g. html and js) <br>
+ * RestController annotation - directs method return values to be converted to JSON/XML <br>
+ * RequestMapping - routes incoming http requests to specific controller methods <br>
  *    class level defines a base path to all endpoints
  */
 @RestController
@@ -40,7 +39,8 @@ public class WordleController {
 
     /**
      * reset - creates a new wordle game instance
-     * @param session
+     * @param session injected by springboot, game state written to session
+     * @return response entity with CREATED status (201) and the newly created game (state)
      */
     @PostMapping("/reset")
     public ResponseEntity<GameStatus> reset(HttpSession session) {
@@ -51,32 +51,27 @@ public class WordleController {
     }
 
     /**
-     * Evaluate the users guess, and return the outcome of the guess itself and game changes
-     * @param guess
-     * @param session
-     * @return guessResponse including color coded letters and game status (e.g. over, winner)
+     * Evaluate the users guess, and return the outcome of the guess and new game state to the client
+     * @param guess POST from user, passed to backend to evaluate
+     * @param session injected, may contain current game, updated to new game state after guess eval
+     * @return guessResponse including color coded letters and updated game status (e.g. over, winner)
      */
     @PostMapping("/guess")
     public GuessResponse guess(@RequestParam String guess, HttpSession session) {
         GameStatus game = getGame(session);
         GuessResponse guessResponse = wordleGame.processGuess(game, guess);
-        GuessResult guessResult = guessResponse.guessResult();
-        game = guessResponse.gameStatus();
-        session.setAttribute("game", game);
-        return new GuessResponse(guessResult, game);
+        session.setAttribute("game", guessResponse.gameStatus());
+        return guessResponse;
     }
 
     /**
      * Returns the game state (e.g. in-progress/game over, if player won, secret word, ...)
-     * @param session
-     * @return game state
+     * @param session injected, if current game not stored, will create and store a new game
+     * @return current game state (if none prior, returns status of a new game)
      */
     @GetMapping("/status")
     public GameStatus getStatus(HttpSession session) {
-        GameStatus game = getGame(session);
-        // test cases can get all information from WordleGame, but for now, allow access to GameStatus methods
-        session.setAttribute("game", game);
-        return game;
+        return getGame(session);
     }
 
     /*
