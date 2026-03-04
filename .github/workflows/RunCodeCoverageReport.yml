@@ -1,4 +1,4 @@
-name: RunCodeCoverageReport.yml
+name: Code Coverage Report
 on:
   # following runs Code Coverage only on PRs or manually (maybe?)
   pull_request:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Ensures the versioning extension can see tags/history
 
       - name: Set up JDK 25
         uses: actions/setup-java@v5.1.0
