@@ -102,6 +102,21 @@
                     <nohelp>true</nohelp>
                 </configuration>
             </plugin>
+            <!-- Enable running Code Coverage in github actions, ref DevOps-335 -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.14</version>
+                <executions>
+                    <execution>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Add this plugin configuration to build the fat JAR -->
             <!--
             <plugin>

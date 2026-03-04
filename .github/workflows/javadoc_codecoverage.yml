@@ -1,4 +1,4 @@
-name: Generate JavaDoc (latest version only, for any branch)
+name: Generate JavaDoc (latest version only, for any branch) and Code Coverage report
 
 # following generates JavaDoc for the application and saves to GitHub Pages
 on:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-JavaDoc:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,7 +39,7 @@ jobs:
         run: mvn javadoc:javadoc
 
       - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: target/site/apidocs
 
@@ -56,3 +56,12 @@ jobs:
           echo "### 🚀 Javadoc Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "The latest documentation is now live." >> $GITHUB_STEP_SUMMARY
           echo "[View Javadocs](${{ steps.deployment.outputs.page_url }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Build and Test with Code Coverage
+        run: mvn -B verify
+
+      - name: Add Coverage to PR
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
