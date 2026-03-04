@@ -1,0 +1,11 @@
+## Description
+<!-- Provide a brief summary of the changes. -->
+
+## Checklist
+- [ ] **All Automated Tests Pass**: New and existing unit tests pass.
+- [ ] **JUnit Coverage > 70%**: JUnit tests appropriate and sufficient.
+- [ ] **Java Doc**: JavaDoc reviewed.  Documentation complete and sufficient to understand the design.
+- [ ] **Downloads and Runs**: Application can be downloaded and run without error
+- [ ] **All System Tests Pass**: At a minimum: no major or critical bugs open (related to story).
+- [ ] **README Updated**: Reflecting changes from this story, e.g. functionality introduced, 
+open bugs, execution guidance.
