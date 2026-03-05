@@ -51,8 +51,9 @@ public class WordleController {
     }
 
     /**
-     * Evaluate the users guess, and return the outcome of the guess and new game state to the client
-     * @param guess POST from user, passed to backend to evaluate
+     * Evaluate the users guess, and return the outcome of the guess and new game state to the client <br>
+     *   note: the guess is NOT passed as a JSON parameter
+     * @param guess POST from user, passed to backend to evaluate - arrives as .../guess?<string>
      * @param session injected, may contain current game, updated to new game state after guess eval
      * @return guessResponse including color coded letters and updated game status (e.g. over, winner)
      */
