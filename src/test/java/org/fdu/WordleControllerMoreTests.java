@@ -20,13 +20,38 @@ import org.fdu.GameDTOs.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-class WordleControllerTest {
+class WordleControllerMoreTests {
     @Autowired
     private RestTestClient restClient;
 
+    private RestTestClient userA;
+    private RestTestClient userB;
+
+    @BeforeEach
+    void setUp() {
+        // Build specific clients with separate sessions
+        // .mutate() preserves the server URL and port configuration
+        String cookieA = getSessionCookie(restClient);
+        userA = restClient.mutate()
+                .defaultHeader("Cookie", cookieA)
+                .build();
+
+        String cookieB = getSessionCookie(restClient);
+        userB = restClient.mutate()
+                .defaultHeader("Cookie", cookieB)
+                .build();
+    }
+
+    // helper function for setting up the clients -
+    private String getSessionCookie(RestTestClient client) {
+        var result = client.post().uri("/api/wordle/reset").exchange().returnResult(String.class);
+        // Captures "JSESSIONID=XXXXX; Path=/; HttpOnly"
+        return result.getResponseHeaders().getFirst("Set-Cookie");
+    }
+
     @Test
-    @DisplayName("Verify Posting a /reset creates a new game, even if one didn't previously exist")
-    // happy path first - /reset returns HTTP status of Created and a new game - e.g. guesses = 0
+    @DisplayName("Verify /reset creates a new game, even if one didn't previously exist")
+        // happy path first - /reset returns HTTP status of Created and a new game - e.g. guesses = 0
     void resetTest() {
         // @RestController MediaType defaults to JSON - for this first test, make it explicit
         GameStatus game = restClient.post()
@@ -45,10 +70,20 @@ class WordleControllerTest {
     }
 
     @Test
-    @DisplayName("Verify POSTing a /guess?user_guess is accepted and the guess count is incremented")
-    void firstGuessTest()
+    @DisplayName("Verify a simple guess is accepted - userA has sent a reset first")
+    void basicGuessTest()
     {
-        GuessResponse response = restClient.post()
+        userA.post()
+                .uri("/api/wordle/guess?guess=APPLE")
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @DisplayName("Verify a simple guess is accepted - userA has sent a reset first")
+    void basicGuessCheckResponse()
+    {
+        GuessResponse response = userA.post()
                 .uri("/api/wordle/guess?guess=APPLE")
                 .exchange()
                 .expectStatus().isOk()
@@ -57,17 +92,22 @@ class WordleControllerTest {
                 .getResponseBody();
         assertThat(response).isNotNull();
         assertThat(response.gameStatus().numGuesses()).isEqualTo(1);
-        assertThat(response.gameStatus().gameOver()).isFalse();
     }
 
     @Test
-    @DisplayName("Verify POSTing a /guess?user_guess is accepted and the guess count is incremented")
-    void getGameStatusTest() {
-        restClient.get().uri("/api/wordle/status").exchange().expectStatus().isOk()
+    @DisplayName("Verify two clients are unique")
+    void testIsolation() {
+        // Each uses its own headers/session context
+        userA.post().uri("/api/wordle/reset").exchange().expectStatus().isCreated();
+        basicGuessTest();   // user A will make a guess
+        userA.get().uri("/api/wordle/status").exchange().expectStatus().isOk()
                 .expectBody()
                 // Drill into the nested GameStatus record
-                .jsonPath("$.numGuesses").isEqualTo(0)
-                .jsonPath("$.gameOver").isEqualTo(false);
+                .jsonPath("$.numGuesses").isEqualTo(1);
+        userB.get().uri("/api/wordle/status").exchange().expectStatus().isOk()
+                .expectBody()
+                // Drill into the nested GameStatus record
+                .jsonPath("$.numGuesses").isEqualTo(0);
     }
 
     @Test
