@@ -1,6 +1,5 @@
 package org.fdu;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +17,11 @@ import org.springframework.http.MediaType;
 
 import org.fdu.GameDTOs.*;
 
+/*
+ * Individual tests of each REST API implemented in the game controller
+ *   IMPORTANT Note: this test class does NOT preserve session IDs between API calls
+ * each API call within a test will have a new session ID and create a new game
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
 class WordleControllerTest {
@@ -61,17 +65,17 @@ class WordleControllerTest {
     }
 
     @Test
-    @DisplayName("Verify POSTing a /guess?user_guess is accepted and the guess count is incremented")
+    @DisplayName("Verify GET /status returns the current game state")
     void getGameStatusTest() {
         restClient.get().uri("/api/wordle/status").exchange().expectStatus().isOk()
                 .expectBody()
-                // Drill into the nested GameStatus record
+                // Drill into the nested GameStatus record, .jsonPath is an alternative, but not preferred
                 .jsonPath("$.numGuesses").isEqualTo(0)
                 .jsonPath("$.gameOver").isEqualTo(false);
     }
 
     @Test
-    @DisplayName("Check some invalid scenarios such as GET a /reset")
+    @DisplayName("Check an invalid scenario such as GET a /reset")
     void resetErrorsTest() {
         restClient.get()
                 .uri("/api/wordle/reset").accept(MediaType.APPLICATION_JSON)
