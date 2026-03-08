@@ -44,7 +44,7 @@ class WordleControllerTest {
         assertThat(game.numGuesses()).isEqualTo(0);
         assertThat(game.maxGuesses()).isEqualTo(6);
         assertThat(game.gameVersion()).isNotEqualTo("");
-        assertThat(game.secretWord()).isNotEqualTo("");
+        assertThat(game.secretWord()).isNotBlank();   // alternative to isNotEqualTo("")
         assertThat(game.gameOver()).isFalse();
     }
 
@@ -62,6 +62,22 @@ class WordleControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.gameStatus().numGuesses()).isEqualTo(1);
         assertThat(response.gameStatus().gameOver()).isFalse();
+    }
+
+    @Test
+    @DisplayName("POSTing an empty guess")
+    void emptyGuessTest()
+    {
+        GuessResponse response = restClient.post()
+                .uri("/api/wordle/guess?guess=")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(GuessResponse.class)
+                .returnResult()
+                .getResponseBody();
+        // response is valid, but should flag as an invalid guess
+        assertThat(response).isNotNull();
+        assertThat(response.guessResult().guessStatus()).isEqualTo(GameDTOs.GuessStatus.INVALID);
     }
 
     @Test

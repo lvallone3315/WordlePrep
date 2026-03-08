@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,10 +45,10 @@ class WordleControllerMoreTests {
     }
 
     @Test
-    @DisplayName("Basic gameplay flow works")
-    void basicGameFlowTest() {
+    @DisplayName("Basic gameplay flow works - reset, guess, status")
+    void simpleGameFlowTest() {
 
-        userA.post().uri("/api/wordle/reset").exchange();
+        userA.post().uri("/api/wordle/reset").exchange().expectStatus().isCreated();
 
         userA.post()
                 .uri("/api/wordle/guess?guess=APPLE")
@@ -77,7 +76,7 @@ class WordleControllerMoreTests {
 
     @Test
     @DisplayName("Verify a first guess is accepted without creating a new game, controller auto-creates a new game")
-    void basicGuessTest() {
+    void guessWithoutResetCreatesGame() {
         userA.post()
                 .uri("/api/wordle/guess?guess=APPLE")
                 .exchange()
@@ -92,7 +91,7 @@ class WordleControllerMoreTests {
 
     @Test
     @DisplayName("Verify again first guess, no reset - same test without using lambdas")
-    void basicGuessCheckResponse() {
+    void guessWithoutResetUsingLambdas() {
         GuessResponse response = userA.post()
                 .uri("/api/wordle/guess?guess=APPLE")
                 .exchange()
@@ -107,16 +106,16 @@ class WordleControllerMoreTests {
     @Test
     @DisplayName("Verify two clients are unique")
     void testIsolation() {
-        // Each uses its own headers/session context
+        // Each user should have its own headers/session context
         userA.post().uri("/api/wordle/reset").exchange().expectStatus().isCreated();
-        basicGuessTest();   // user A will make a guess
+        userA.post().uri("/api/wordle/guess?guess=APPLE").exchange();
         userA.get().uri("/api/wordle/status").exchange().expectStatus().isOk()
                 .expectBody()
                 // Drill into the nested GameStatus record
                 .jsonPath("$.numGuesses").isEqualTo(1);
+        // 2nd user - status should indicate no guesses
         userB.get().uri("/api/wordle/status").exchange().expectStatus().isOk()
                 .expectBody()
-                // Drill into the nested GameStatus record
                 .jsonPath("$.numGuesses").isEqualTo(0);
     }
 }
