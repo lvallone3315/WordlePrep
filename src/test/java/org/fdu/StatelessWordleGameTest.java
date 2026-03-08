@@ -24,7 +24,7 @@ class StatelessWordleGameTest {
         assertFalse(status.gameOver());
         assertFalse(status.userWon());
         assertEquals(0, status.numGuesses());
-        assertEquals(6, status.maxGuesses());
+        assertEquals(WordleRules.MAX_GUESSES, status.maxGuesses());
     }
     @Test
         // verifies there is a valid game version (doesn't include "unknown")

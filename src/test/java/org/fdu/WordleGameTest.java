@@ -27,7 +27,8 @@ class WordleGameInitializationTest {
         assertFalse(gameStatus.gameOver(), "Initial game state showing game is Over");
         assertFalse(gameStatus.userWon(), "Initial game state showing user already won");
         assertEquals(0, gameStatus.numGuesses(), "Initial game state number remaining guesses not zero");
-        assertEquals(6, gameStatus.maxGuesses(), "Initial game state, max user guesses != 6");
+        assertEquals(WordleRules.MAX_GUESSES, gameStatus.maxGuesses(),
+                "Initial game state, max user guesses != " + WordleRules.MAX_GUESSES );
         System.out.println("Game Version #: " + gameStatus.gameVersion());
         assertFalse(gameStatus.gameVersion().toLowerCase().contains("unknown"));
         // local versions include snapshot - this may fail for production builds
