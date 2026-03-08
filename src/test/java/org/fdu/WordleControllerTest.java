@@ -46,6 +46,7 @@ class WordleControllerTest {
         assertThat(game.gameVersion()).isNotEqualTo("");
         assertThat(game.secretWord()).isNotBlank();   // alternative to isNotEqualTo("")
         assertThat(game.gameOver()).isFalse();
+        assertThat(game.gameVersion()).isNotNull().isNotEmpty();  // we display game version, verify we have one
     }
 
     @Test
@@ -61,6 +62,7 @@ class WordleControllerTest {
                 .getResponseBody();
         assertThat(response).isNotNull();
         assertThat(response.gameStatus().numGuesses()).isEqualTo(1);
+        assertThat(response.gameStatus().maxGuesses()).isGreaterThanOrEqualTo(1);  // remaining guesses uses maxGuesses, verify it's real
         assertThat(response.gameStatus().gameOver()).isFalse();
     }
 
@@ -88,6 +90,7 @@ class WordleControllerTest {
                 // Drill into the nested GameStatus record, .jsonPath is an alternative, but not preferred
                 .jsonPath("$.numGuesses").isEqualTo(0)
                 .jsonPath("$.gameOver").isEqualTo(false);
+
     }
 
     @Test
