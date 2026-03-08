@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.fdu.GameDTOs.*;
 
-// this is not really useful - will deprecate most of these tests in favor of mockMvc
+// for example only of mockMvc testing - will deprecate most of these tests in favor of full server testing
 
 @SpringBootTest
 @AutoConfigureMockMvc

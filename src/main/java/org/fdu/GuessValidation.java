@@ -1,7 +1,7 @@
 package org.fdu;
 
 /**
- * Provides validation rules for word guesses.
+ * Provides validation rules for word guesses.  Includes enum of failure reasons.
  * <p>
  * Class is stateless and intended to be used as a utility. <br>
  *  No public constructor is provided. <br>
@@ -31,7 +31,46 @@ public final class GuessValidation {
         return userGuess.trim().toUpperCase();
     }
 
+    /**
+     * ValidationReason enum: includes explicit ASCII string for the enum <br>
+     *   Currently - enum ASCII = enum.name() <br>
+     *   ValidationReason constructor - creates each object and populates the String code <br>
+     *   getReasonString() - returns String associated with the enum object <br>
+     *   getReasonEnum() - returns enum object associated with the string, UNKNOWN enum if string not valid
+     */
+    public enum ValidationReason {
+        /** Guess met word requirements (length, alphabetic).  ToDo - Tech Debt: rename to GOOD_GUESS, or ... */
+        VALID("VALID"),
+        /** Guess length  shorter or longer than required word length (5 chars), priority higher than NON_ALPHA */
+        INVALID_LENGTH("INVALID_LENGTH"),
+        /** Guess contains characters other than a-z or A-Z */
+        NON_ALPHA("NON_ALPHA"),
+        /** Guess declined since the game is already over */
+        GAME_OVER("GAME_OVER"),
+        /** Unknown failure reason, should never occur */
+        UNKNOWN("UNKNOWN");
 
+        private final String code;
+        ValidationReason(String code) { this.code = code;}
+
+        public String getReasonString() {
+            return this.code;
+        }
+
+        /**
+         * Given a reason string (e.g. why validation failed), convert to an enum
+         * @param reasonString - ASCII representation of a reason code enum
+         * @return - reason code enum
+         */
+        public static ValidationReason getReasonEnum(String reasonString) {
+            for (ValidationReason reason : ValidationReason.values()) {
+                if (reason.code.equals(reasonString)) {
+                    return reason;
+                }
+            }
+            return UNKNOWN;
+        }
+    }    // end ValidationReason enum
     /**
      * Record (immutable) encapsulating results of word validation including validity and enum reason details. <br>
      *   returned by validateWord() method
@@ -66,42 +105,6 @@ public final class GuessValidation {
         // if we got here, met all requirements, return valid
         return new ValidationResult(true, ValidationReason.VALID);  //
     }
-
-    /**
-     * ValidationReason enum: includes explicit ASCII string for the enum <br>
-     *   Currently - enum ASCII = enum.name() <br>
-     *   ValidationReason constructor - creates each object and populates the String code <br>
-     *   getReasonString() - returns String associated with the enum object <br>
-     *   getReasonEnum() - returns enum object associated with the string, UNKNOWN enum if string not valid
-     */
-    public enum ValidationReason {
-        VALID("VALID"),
-        INVALID_LENGTH("INVALID_LENGTH"),
-        NON_ALPHA("NON_ALPHA"),
-        GAME_OVER("GAME_OVER"),
-        UNKNOWN("UNKNOWN");
-
-        private final String code;
-        ValidationReason(String code) { this.code = code;}
-
-        public String getReasonString() {
-            return this.code;
-        }
-
-        /**
-         * Given a reason string (e.g. why validation failed), convert to an enum
-         * @param reasonString - ASCII representation of a reason code enum
-         * @return - reason code enum
-         */
-        public static ValidationReason getReasonEnum(String reasonString) {
-            for (ValidationReason reason : ValidationReason.values()) {
-                if (reason.code.equals(reasonString)) {
-                    return reason;
-                }
-            }
-            return UNKNOWN;
-        }
-    }    // end ValidationReason enum
 
     /**
      * Validate if guess meets the game requirements (e.g. exactly 5 characters, all alphabetic a-z)
