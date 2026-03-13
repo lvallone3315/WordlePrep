@@ -22,13 +22,23 @@ public class GameDTOs {
     public enum GuessStatus {VALID, INVALID}
 
     /**
+     * Captures a valid guess and its evaluation (ie colors), used for saving guess and eval history in game state
+     * @param guess raw user guess, expected only valid guesses
+     * @param evaluation colored evaluation of guess
+     */
+    public record GuessRow(
+            String guess,
+            GuessEvaluation.Result[] evaluation
+    ) {}
+
+    /**
      * DTO (data transfer object) for game status
      * @param  gameOver - true if the game is over, true if the player lost or won.
      * @param  userWon - true if the player has won, false if the game is still running, or over and the player lost
      * @param secretWord - word the player is trying guess
      * @param numGuesses - number of guesses so far, remaining guesses = maxGuesses - numGuesses
      * @param maxGuesses - maximum number of guess users can make before gameis over
-     * @param guesses - list of all valid user guesses (raw, as entered) in current game
+     * @param guesses - list of all valid user guesses (raw, as entered) and evaluations in current game
      * @param gameVersion - dynamically populated version number for the game
      */
     public record GameStatus(boolean gameOver,
@@ -36,7 +46,7 @@ public class GameDTOs {
                              String secretWord,
                              int numGuesses,
                              int maxGuesses,
-                             List<String> guesses,
+                             List<GuessRow> guesses,
                              String gameVersion) {
 
         /**
@@ -45,7 +55,7 @@ public class GameDTOs {
          * @param won - updated value for userWon
          * @param newGuessCount - new number of guesses (typically previous +1)
          * @return - updated GameStatus DTO with updates + original values
-         * @deprecated (since 13-March, 2026)
+         * @deprecated since 2026-03-13
          *  Replaced by wither of same name with latest valid user guess
          */
         public GameStatus withGameUpdates(boolean isOver, boolean won, int newGuessCount) {
@@ -65,12 +75,15 @@ public class GameDTOs {
          * @param won - updated value for userWon
          * @param newGuessCount - new number of guesses (typically previous +1)
          * @param newGuess - new valid user guess, added to list of user guesses in the current game
+         * @param newGuessEvaluation - colored evaluation of guess parameter
          * @return - updated GameStatus DTO with updates + original values
          */
-        public GameStatus withGameUpdates(boolean isOver, boolean won, int newGuessCount, String newGuess){
+        public GameStatus withGameUpdates(boolean isOver, boolean won, int newGuessCount,
+                                          String newGuess, GuessEvaluation.Result[] newGuessEvaluation){
 
-            List<String> updatedGuesses = new ArrayList<>(this.guesses);
-            updatedGuesses.add(newGuess);
+            List<GuessRow> updatedGuesses = new ArrayList<>(this.guesses);
+            updatedGuesses.add(new GuessRow(newGuess,
+                    newGuessEvaluation.clone()));  // copy to prevent a caller from changing original
             return new GameStatus(
                     isOver,    // updated
                     won,       // updated

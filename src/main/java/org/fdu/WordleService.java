@@ -70,7 +70,7 @@ public class WordleService {
         // game status uses a wither update based on the original game DTO, returns a new GameStatus record
         //    only updates the values passed (e.g. gaveOver), the other values are copied by the DTO handler
         //    note: adds the RAW (as entered) user input to the DTO, not the normalized version
-        GameStatus newStatus = game.withGameUpdates(gameOver, userWon, newNumGuesses, userGuess);
+        GameStatus newStatus = game.withGameUpdates(gameOver, userWon, newNumGuesses, userGuess, results);
         return new GuessResponse(newResult, newStatus);
     }
 }
