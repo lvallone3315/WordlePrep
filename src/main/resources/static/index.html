@@ -148,14 +148,20 @@
                     const messagesDiv = document.getElementById("messages");
                     messagesDiv.innerHTML = "<strong>Rejoining a game already in progress!</strong>";
                 }
+                // walk through guess history and display colored guess evaluations
+                for (const guessRow of data.guesses) {
+                    displayRow(guessRow.guess, guessRow.evaluation);
+                }
             }
         } catch (err) {
             document.getElementById('app-version').innerText = "version: offline";
         }
     }
 
-    async function sendGuess() {
-        const guess = document.getElementById("guessInput").value.trim();
+    // guessParam passed in when redrawing prior guesses (e.g. rejoining a game in progress)
+    async function sendGuess(guessParam) {
+        // if redrawing prior guesses, user parameter, otherwise use new user input
+        const guess = guessParam ?? document.getElementById("guessInput").value.trim();
         if (!guess) return;
 
         const response = await fetch(`/api/wordle/guess?guess=${guess}`, { method: 'POST' });
@@ -164,13 +170,8 @@
         clearMessages();           // clear prior message
 
         // Display guess result
-        const resultsDiv = document.getElementById("results");
         const evaluation = data.guessResult.evaluation || [];
-        const row = evaluation.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
-        const div = document.createElement('div');
-        div.className = "result";
-        div.innerHTML = row;
-        resultsDiv.appendChild(div);
+        displayRow(guess, evaluation);
         clearGuessInput();   // clear the button contents & refocus for next input
 
 
@@ -202,6 +203,18 @@
         else
             displayRemainingGuesses(remainingGuesses);
     }  // end sendGuess
+
+    function displayRow(guess, evaluation) {
+        const row = evaluation
+            .map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`)
+            .join(' ');
+        const div = document.createElement('div');
+        div.className = "result";
+        div.innerHTML = row;
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.appendChild(div);
+    }
 
     // a little permuted, object flag is disabled, but for clarity using true to mean enable game controls
     function setGameControls(enabled) {
