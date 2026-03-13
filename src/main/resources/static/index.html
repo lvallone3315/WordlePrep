@@ -171,7 +171,12 @@
 
         // Display guess result
         const evaluation = data.guessResult.evaluation || [];
-        displayRow(guess, evaluation);
+
+        // walk through guess history and display colored guess evaluations
+        clearResults()
+        for (const guessRow of data.gameStatus.guesses) {
+            displayRow(guessRow.guess, guessRow.evaluation);
+        }
         clearGuessInput();   // clear the button contents & refocus for next input
 
 
