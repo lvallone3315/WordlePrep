@@ -18,7 +18,8 @@ public class WordleService {
      *   if game over - set the gameOver flag  (userWon and gameOver retrieved from getGameStatus()) <br>
      *   DTOs<br>
      *   GuessResult - guess validity, colored evaluation[], reason for invalid guesses (e.g. INVALID_LENGTH) <br>
-     *   GameStatus - updated gameOver, userWon and numGuesses fields, rest (e.g. maxGuesses) copied from original game status DTO <br>
+     *   GameStatus - only updated for valid guesses<br>
+     *   ...updated gameOver, userWon, list of guesses and numGuesses fields, rest (e.g. maxGuesses) copied from original game status DTO <br>
      *
      * @param game current game state, new game state returned after the guess is processed
      * @param userGuess can be raw guess from user (incl. white space and mixed case), will validate and normalize
@@ -68,7 +69,8 @@ public class WordleService {
                 validation.reason() );
         // game status uses a wither update based on the original game DTO, returns a new GameStatus record
         //    only updates the values passed (e.g. gaveOver), the other values are copied by the DTO handler
-        GameStatus newStatus = game.withGameUpdates(gameOver, userWon, newNumGuesses);
+        //    note: adds the RAW (as entered) user input to the DTO, not the normalized version
+        GameStatus newStatus = game.withGameUpdates(gameOver, userWon, newNumGuesses, userGuess);
         return new GuessResponse(newResult, newStatus);
     }
 }

@@ -1,5 +1,8 @@
 package org.fdu;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Data Class for processing user guesses and game state<p>
  *
@@ -16,7 +19,7 @@ public class GameDTOs {
     /**
      * Enum describing if user's guess meets game requirements (VALID).  If not, INVALID.
      */
-    public enum GuessStatus {VALID, INVALID};
+    public enum GuessStatus {VALID, INVALID}
 
     /**
      * DTO (data transfer object) for game status
@@ -25,6 +28,7 @@ public class GameDTOs {
      * @param secretWord - word the player is trying guess
      * @param numGuesses - number of guesses so far, remaining guesses = maxGuesses - numGuesses
      * @param maxGuesses - maximum number of guess users can make before gameis over
+     * @param guesses - list of all valid user guesses (raw, as entered) in current game
      * @param gameVersion - dynamically populated version number for the game
      */
     public record GameStatus(boolean gameOver,
@@ -32,22 +36,48 @@ public class GameDTOs {
                              String secretWord,
                              int numGuesses,
                              int maxGuesses,
+                             List<String> guesses,
                              String gameVersion) {
 
         /**
          * "Wither" pattern for GameStatus.  Return a new instance with only the dynamic elements changed.
          * @param isOver - updated value for gameOver
          * @param won - updated value for userWon
-         * @param guesses - new number of guesses (typically previous +1)
+         * @param newGuessCount - new number of guesses (typically previous +1)
          * @return - updated GameStatus DTO with updates + original values
+         * @deprecated (since 13-March, 2026)
+         *  Replaced by wither of same name with latest valid user guess
          */
-        public GameStatus withGameUpdates(boolean isOver, boolean won, int guesses) {
+        public GameStatus withGameUpdates(boolean isOver, boolean won, int newGuessCount) {
             return new GameStatus(
                     isOver,    // updated
                     won,       // updated
                     this.secretWord,
-                    guesses,   // updated
+                    newGuessCount,   // updated
                     this.maxGuesses,
+                    this.guesses,
+                    this.gameVersion);
+        }
+
+        /**
+         * new "Wither" pattern for GameStatus incl. list of user guesses.  Return a new instance with only the dynamic elements changed.
+         * @param isOver - updated value for gameOver
+         * @param won - updated value for userWon
+         * @param newGuessCount - new number of guesses (typically previous +1)
+         * @param newGuess - new valid user guess, added to list of user guesses in the current game
+         * @return - updated GameStatus DTO with updates + original values
+         */
+        public GameStatus withGameUpdates(boolean isOver, boolean won, int newGuessCount, String newGuess){
+
+            List<String> updatedGuesses = new ArrayList<>(this.guesses);
+            updatedGuesses.add(newGuess);
+            return new GameStatus(
+                    isOver,    // updated
+                    won,       // updated
+                    this.secretWord,
+                    newGuessCount,   // updated
+                    this.maxGuesses,
+                    updatedGuesses,
                     this.gameVersion);
         }
         /**

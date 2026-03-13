@@ -1,6 +1,7 @@
 package org.fdu;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.fdu.GameDTOs.*;
@@ -58,6 +59,7 @@ public class WordleGame {
                 secretWord,      // secretWord, passed in (possibly created by dictionary version)
                 0,               // number of guesses taken
                 WordleRules.MAX_GUESSES,     // maximum number of guesses allowed
+                new ArrayList<>(),
                 this.gameVersion);    // derived version of the game
     }
 
