@@ -5,7 +5,7 @@ package org.fdu;
  * <p>
  * Class is stateless and intended to be used as a utility. <br>
  *  No public constructor is provided. <br>
- * It enforces rules such as {@link #WORD_LENGTH} and alphabetical constraints (a-z and A-Z) <br>
+ * It enforces rules such as {@link WordleRules#WORD_LENGTH} and alphabetical constraints (a-z and A-Z) <br>
  * <p>
  * {@link #normalizeWord(String)} removes leading and trailing white space) and shifts all characters to UPPERCASE <p>
  * <p>
@@ -15,9 +15,6 @@ package org.fdu;
  * @version v1.0.0
  */
 public final class GuessValidation {
-
-    /** Required length for guesses and secret words (ASCII characters), current value is {@value} */
-    public static final int WORD_LENGTH = 5;
 
     /** private empty constructor, class intended to be used static **/
     private GuessValidation() {}
@@ -92,7 +89,7 @@ public final class GuessValidation {
         String localUserGuess = userGuess.trim();   // trim leading and trailing white space
 
         // check length - must be an exact match, ie too long is no good either
-        if (localUserGuess.length() != WORD_LENGTH){
+        if (localUserGuess.length() != WordleRules.WORD_LENGTH) {
             return new ValidationResult(false, ValidationReason.INVALID_LENGTH);
         }
 
@@ -117,7 +114,7 @@ public final class GuessValidation {
     public static boolean isWordValid(String userGuess) {
         String localUserGuess = userGuess.trim();  // trim leading and trailing white space
 
-        if (localUserGuess.length() != WORD_LENGTH) return false;  // first trim
+        if (localUserGuess.length() != WordleRules.WORD_LENGTH) return false;  // first trim
         for (int i = 0; i < localUserGuess.length(); i++) {
             if (!Character.isLetter(localUserGuess.charAt(i))) {
                 return false;

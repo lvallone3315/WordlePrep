@@ -42,7 +42,7 @@ class WordleControllerTest {
                 .getResponseBody();     // extract it
         assertThat(game).isNotNull();
         assertThat(game.numGuesses()).isEqualTo(0);
-        assertThat(game.maxGuesses()).isEqualTo(6);
+        assertThat(game.maxGuesses()).isEqualTo(WordleRules.MAX_GUESSES);
         assertThat(game.gameVersion()).isNotEqualTo("");
         assertThat(game.secretWord()).isNotBlank();   // alternative to isNotEqualTo("")
         assertThat(game.gameOver()).isFalse();

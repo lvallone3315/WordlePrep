@@ -108,7 +108,7 @@
         await fetch(`/api/wordle/reset`, { method: 'POST' });
         clearGameDisplay();
         setGameControls(true);
-        getGameStatus();   // displays version number and number of guesses available
+        getGameStatus();   // displays version number and number of guesses available, no await, keeps executing
     }
 
     async function getGameStatus() {
@@ -116,44 +116,50 @@
             const response = await fetch(`/api/wordle/status`, { method: 'GET' });
             const data = await response.json();
                 // Find the version element and update it with the value from gameStatus
-            if (data.gameVersion) {
-                document.getElementById('app-version').innerText = "version: " + data.gameVersion;
-            }
+           displayGameVersion(data.gameVersion);
+
             // Display the current remaining guesses on load ---
-            if (data.maxGuesses) {
-                const remaining = data.maxGuesses - data.numGuesses;
-                displayRemainingGuesses(remaining);
+            if (data.maxGuesses != null) {
+                displayRemainingGuesses(data.maxGuesses - data.numGuesses);
             }
         } catch (err) {
-            document.getElementById('app-version').innerText = "version: offline";
+            displayGameVersion("offline");
         }
     }
 
+    window.onload = async () => {
+        await resetGameIfOver();
+    };
+
     async function resetGameIfOver() {
         try {
+            // duplicates much of getGameStatus, except call to resetGame if game over &
+            // if rejoining a game in-progress, custom message + display guess history
             const response = await fetch(`/api/wordle/status`, { method: 'GET' });
             const data = await response.json();
             // Find the version element and update it with the value from gameStatus
-            if (data.gameVersion) {
-                document.getElementById('app-version').innerText = "version: " + data.gameVersion;
-            }
+            displayGameVersion(data.gameVersion);
+            if (data.gameOver) return resetGame();
+
             // Display the current remaining guesses on load ---
-            if (data.gameOver) {
-                resetGame();
-            }
-            else if (data.maxGuesses) {
+            if (data.maxGuesses != null) {
                 const remaining = data.maxGuesses - data.numGuesses;
                 displayRemainingGuesses(remaining);
+
                 if (remaining < data.maxGuesses) {
                     const messagesDiv = document.getElementById("messages");
                     messagesDiv.innerHTML = "<strong>Rejoining a game already in progress!</strong>";
                 }
+                displayHistory(data.guesses);
             }
         } catch (err) {
-            document.getElementById('app-version').innerText = "version: offline";
+            displayGameVersion("offline");
         }
     }
 
+    // user typed in a guess, redraw full history from game state object
+    //   in case another user interleaved a guess in our game (should only happen in local runs)
+    //   evaluate the game state and output the appropriate messages
     async function sendGuess() {
         const guess = document.getElementById("guessInput").value.trim();
         if (!guess) return;
@@ -161,18 +167,11 @@
         const response = await fetch(`/api/wordle/guess?guess=${guess}`, { method: 'POST' });
         const data = await response.json();
         console.log("JSON keys returned: ", data.guessResult);
-        clearMessages();           // clear prior message
+        clearMessages();
+        clearResults();
 
-        // Display guess result
-        const resultsDiv = document.getElementById("results");
-        const evaluation = data.guessResult.evaluation || [];
-        const row = evaluation.map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`).join(' ');
-        const div = document.createElement('div');
-        div.className = "result";
-        div.innerHTML = row;
-        resultsDiv.appendChild(div);
+        displayHistory(data.gameStatus.guesses);
         clearGuessInput();   // clear the button contents & refocus for next input
-
 
         // Display game status messages
         const messagesDiv = document.getElementById("messages");
@@ -203,13 +202,22 @@
             displayRemainingGuesses(remainingGuesses);
     }  // end sendGuess
 
+
+    //  Helper functions
+    // display the game version
+    function displayGameVersion(gameVersion) {
+        if (gameVersion) {
+            document.getElementById('app-version').innerText = "version: " + gameVersion;
+        }
+    }
+
     // a little permuted, object flag is disabled, but for clarity using true to mean enable game controls
     function setGameControls(enabled) {
         document.querySelector("button[type='submit']").disabled = !enabled;
         document.getElementById("guessInput").disabled = !enabled;
     }
 
-    // helper function to display the number of guesses remaining to the player
+    // display the number of guesses remaining to the player
     function displayRemainingGuesses(remainingGuesses) {
         const guessDiv = document.getElementById("guesses");
         if (!guessDiv) return;  //
@@ -219,12 +227,32 @@
         const textColor = (remainingGuesses === 1) ? "color: red;": "";
         guessDiv.innerHTML = `<strong style = "${textColor}">You have ${remainingGuesses} ${guessText} remaining</strong>`;
     }
-    // helper function to display the number of guesses the player used to solve the puzzle
+
+    // display the number of guesses the player used to solve the puzzle
     function displayGuessesUsed(guessesUsed) {
         const guessDiv = document.getElementById("guesses");
         if (!guessDiv) return;
         const guessText = (guessesUsed === 1) ? "guess" : "guesses";
         guessDiv.innerHTML = `<strong style = "color:green">You used ${guessesUsed} ${guessText} to solve the puzzle</strong>`;
+    }
+
+    // walk through guess history and display colored guess evaluations
+    function displayHistory(guesses = []) {
+        clearResults();
+        for (const guessRow of guesses) {
+            displayRow(guessRow.guess, guessRow.evaluation);
+        }
+    }
+    function displayRow(guess, evaluation) {
+        const row = evaluation
+            .map((res, i) => `<span class="${res}">${guess[i].toUpperCase()}</span>`)
+            .join(' ');
+        const div = document.createElement('div');
+        div.className = "result";
+        div.innerHTML = row;
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.appendChild(div);
     }
 
     // clear entire display, or individual helper functions to clear a display element
@@ -235,24 +263,15 @@
         clearGuesses();
     }
 
+    // Clear helper functions
     function clearGuessInput() {
         const input = document.getElementById("guessInput");
         input.value = "";
         input.focus();
     }
+    function clearMessages() { document.getElementById("messages").innerHTML = ""; }
+    function clearResults() { document.getElementById("results").innerHTML = ""; }
+    function clearGuesses() { document.getElementById("guesses").innerHTML = ""; }
 
-    function clearMessages() {
-        document.getElementById("messages").innerHTML = "";
-    }
 
-    function clearResults() {
-        document.getElementById("results").innerHTML = "";
-    }
-    function clearGuesses() {
-        document.getElementById("guesses").innerHTML = "";
-    }
-
-    window.onload = async () => {
-        await resetGameIfOver();
-    };
 </script>
