@@ -115,6 +115,12 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>org/fdu/WordleWebApplication*</exclude>
+                        <exclude>org/fdu/Main*</exclude>
+                    </excludes>
+                </configuration>
                 <version>0.8.14</version>
                 <executions>
                     <execution>
