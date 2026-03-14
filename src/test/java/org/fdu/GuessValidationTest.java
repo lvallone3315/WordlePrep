@@ -131,7 +131,7 @@ class GuessValidationTest {
     }
 
     @Test
-    void getREasonEnumTest() {
+    void getReasonEnumTest() {
         System.out.println("*** Testing mapping of strings to enums match requirements\n");
         assertEquals(VALID, getReasonEnum("VALID"));
         assertEquals(INVALID_LENGTH, getReasonEnum("INVALID_LENGTH"));

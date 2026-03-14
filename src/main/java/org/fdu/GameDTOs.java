@@ -29,7 +29,17 @@ public class GameDTOs {
     public record GuessRow(
             String guess,
             GuessEvaluation.Result[] evaluation
-    ) {}
+    ) {  // print out actual enums for the evaluation
+        @Override
+        public String toString() {
+            return "GuessRow[guess=" + guess +
+                    ", evaluation=" +
+                    (evaluation == null ? "null"
+                            : java.util.Arrays.toString(evaluation)) +
+                    "]";
+        }
+    }
+
 
     /**
      * DTO (data transfer object) for game status
