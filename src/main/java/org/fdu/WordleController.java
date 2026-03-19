@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.SerializationFeature;
+import java.util.*;
+
 /**
  * REST APIs supporting the Web UI interface (e.g. html and js) <br>
  * RestController annotation - directs method return values to be converted to JSON/XML <br>
@@ -60,8 +64,12 @@ public class WordleController {
     @PostMapping("/guess")
     public GuessResponse guess(@RequestParam String guess, HttpSession session) {
         GameStatus game = getGame(session);
+        // --- DEBUG: Print the "raw" session state to the logs ---
+        System.out.println("B4 Session State:\n" + getRawSessionData(session));
         GuessResponse guessResponse = wordleGame.processGuess(game, guess);
         session.setAttribute("game", guessResponse.gameStatus());
+        // --- DEBUG: Print the "raw" session state to the logs ---
+        System.out.println("Post Guess Session State:\n" + getRawSessionData(session));
         return guessResponse;
     }
 
@@ -75,8 +83,35 @@ public class WordleController {
         return getGame(session);
     }
 
+    /**
+     * Private session display (full contents of session)
+     * @param session containing the game state
+     * @return String encapsulating the session to be printed
+     */
+    private String getRawSessionData(HttpSession session) {
+        // Jackson 3 uses a fluent Builder for configuration
+        JsonMapper mapper = JsonMapper.builder()
+                .enable(SerializationFeature.INDENT_OUTPUT) // Pretty print
+                .build();
+
+        // Map<String, Object> attributes = new HashMap<>();
+        Map<String, Object> debugInfo = new LinkedHashMap<>();
+        Enumeration<String> names = session.getAttributeNames();
+        // Add the Session ID
+        debugInfo.put("___SESSION_ID___", session.getId());
+
+        // add the rest of the attributes to the output string
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            debugInfo.put(name, session.getAttribute(name));
+        }
+
+        // Serialize to JSON
+        return mapper.writeValueAsString(debugInfo);
+    }
+
     /*
-     * below was the starter code for this method, displaying Welcome on the brownser window
+     * below was the starter code for this method, displaying Welcome on the browser window
      * demonstrating the html/js and controller were up and running
      * @GetMapping("/wordle")
      * public String intro() {
